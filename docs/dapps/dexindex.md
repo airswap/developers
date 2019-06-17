@@ -4,4 +4,4 @@
 
 ![DexIndex](../assets/dapps/dexindex.png)
 
-Now that we've seen some dApps built on the AirSwap network, let's take a look at the [AirSwap API ⟶](../api/peers.md)
+Now that we've seen some dApps built on the AirSwap network, let's take a look at the [AirSwap API ⟶](/api/peers.md)
