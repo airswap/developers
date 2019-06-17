@@ -23,7 +23,9 @@
 </head>
 
 <body>
-  <div id="app">Loading...</div>
+  <div id="app">
+
+  </div>
   <div class="social-container">
     <a href="https://github.com/airswap/developers" target="_blank">
       <img class="social-icon" src="./assets/social/github.svg" alt="github-icon">
@@ -40,7 +42,7 @@
   </div>
   <script>
     window.$docsify = {
-      name: '<img src="./assets/logo/AirSwap-Logotype-Mark-Blue.png" class="sidebar-logo" alt="AirSwap-Logo">',
+      name: '<img src="./assets/logo/AirSwap-Logotype-Blue.png" class="sidebar-logo" alt="AirSwap-Logo">',
       themeColor: '#2B71FF',
       subMaxLevel: 3,
       maxLevel: 3,
@@ -64,6 +66,44 @@
   <script src="//unpkg.com/prismjs/components/prism-json.min.js"></script>
   <script src="//unpkg.com/docsify-pagination/dist/docsify-pagination.min.js"></script>
   <script src="//unpkg.com/docsify/lib/plugins/ga.min.js"></script>
+  <script src="//unpkg.com/docsify/lib/plugins/external-script.min.js"></script>
+  <script>
+    window.intercomSettings = {
+      app_id: "xbgkc7bo"
+    };
+  </script>
+  <script>
+    (function() {
+      var w = window;
+      var ic = w.Intercom;
+      if (typeof ic === "function") {
+        ic('reattach_activator');
+        ic('update', w.intercomSettings);
+      } else {
+        var d = document;
+        var i = function() {
+          i.c(arguments);
+        };
+        i.q = [];
+        i.c = function(args) {
+          i.q.push(args);
+        };
+        w.Intercom = i;
+        var l = function() {
+          var s = d.createElement('script');
+          s.type = 'text/javascript';
+          s.async = true;
+          s.src = 'https://widget.intercom.io/widget/xbgkc7bo';
+          var x = d.getElementsByTagName('script')[0];
+          x.parentNode.insertBefore(s, x);
+        };
+        if (w.attachEvent) {
+          w.attachEvent('onload', l);
+        } else {
+          w.addEventListener('load', l, false);
+        }
+      }
+    })();
+  </script>
 </body>
-
 </html>

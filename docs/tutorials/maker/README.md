@@ -2,7 +2,7 @@
 
 ## Overview
 
-In [Concepts](../api/concepts.md), we learned about Makers and Takers and how they interact with one another using dApps and APIs. We looked at the [Indexer](../api/indexer.md) and learned about Intents. In this tutorial, you'll learn how to put together these concepts in order to provide liquidity on the AirSwap network. Over the course of this tutorial, you'll learn how to:
+In [Concepts](../getting-started/concepts.md), we learned about Makers and Takers and how they interact with one another using dApps and APIs. We looked at the [Indexer](../api/indexer.md) and learned about Intents. In this tutorial, you'll learn how to put together these concepts in order to provide liquidity on the AirSwap network. Over the course of this tutorial, you'll learn how to:
 
 * Authenticate with the AirSwap Websocket
 * Create Intents
@@ -21,7 +21,7 @@ In [Concepts](../api/concepts.md), we learned about Makers and Takers and how th
 
 ## Getting Started
 
-First, use the [Faucet](https://faucet.rinkeby.io/) to obtain Rinkeby ETH. Then, go to the [AirSwap Sandbox](https://sandbox.airswap.io) and obtain at least 250 Rinkeby AST. 
+First, use the [Faucet](https://faucet.rinkeby.io/) to obtain Rinkeby ETH. Then, go to the [AirSwap Sandbox](https://sandbox.airswap.io) and obtain at least 250 Rinkeby AST.
 
 Use ENV to control which environment to connect to. We'll use the `sandbox` for Rinkeby. You can use for `production` for Mainnet when you're ready to go live.
 
@@ -63,7 +63,7 @@ const routerParams = {
 const router = new Router(routerParams)
 ```
 
-Next, create an asynchronous main() function to connect. 
+Next, create an asynchronous main() function to connect.
 
 ```javascript
 async function main() {
