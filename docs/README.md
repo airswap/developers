@@ -1,4 +1,4 @@
-![AirSwap Developer Tools](./assets/logo/AirSwap-Developer-Tools-Logo.png)
+![AirSwap Developers](./assets/logo/AirSwap-Developers-Title.png)
 
 ## What is AirSwap? {docsify-ignore-all}
 
