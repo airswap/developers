@@ -1,0 +1,14 @@
+{
+  "name": "airswap-maker-tutorial",
+  "version": "1.0.0",
+  "description": "AirSwap Maker Tutorial",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "airswap.js": "^0.0.21",
+    "bignumber.js": "^9.0.0"
+  }
+}

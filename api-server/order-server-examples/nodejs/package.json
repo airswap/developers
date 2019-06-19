@@ -1,7 +1,7 @@
 {
   "name": "airswap-order-server",
   "version": "0.0.1",
-  "description": "An example order server for making markets on AirSwap",
+  "description": "An example order server for becoming a Maker on AirSwap",
   "author": "AirSwap",
   "main": "server.js",
   "scripts": {

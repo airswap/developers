@@ -1,9 +1,0 @@
-{
-  "name": "airswap-maker-tutorial",
-  "version": "1.0.0",
-  "main": "orderServer.js",
-  "dependencies": {
-    "axios": "^0.18.0",
-    "bignumber.js": "^7.2.1"
-  }
-}

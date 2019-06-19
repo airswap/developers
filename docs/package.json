@@ -1,0 +1,13 @@
+{
+  "name": "@airswap/developers",
+  "version": "1.0.0",
+  "description": "AirSwap Developer Docs",
+  "main": "./src/index.html",
+  "scripts": {
+    "serve": "docsify serve ."
+  },
+  "devDependencies": {
+    "docsify-cli": "^4.3.0"
+  },
+  "license": "Apache-2.0"
+}

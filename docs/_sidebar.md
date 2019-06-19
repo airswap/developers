@@ -1,36 +1,34 @@
--   Getting Started
+- Getting Started
 
-    -   [Introduction](README.md)
-    -   [API Overview](APIOverview/overview.md)
+    -   [What is AirSwap?]()
+    -   [Concepts](getting-started/concepts.md)
+    -   [Quick Start](getting-started/quickstart.md)
 
--   Developer API
+- API
 
-    -   [Introduction](developerAPI/introduction.md)
-    -   [Concepts](developerAPI/concepts.md)
-    -   [Getting and Providing Orders](developerAPI/getting-and-providing-orders.md)
-    -   [Using the Indexer](developerAPI/using-the-indexer.md)
-    -   [Using Ethereum](developerAPI/using-ethereum.md)
+    -   [Peers](api/peers.md)
+    -   [Indexer](api/indexer.md)
+    -   [AirSwap.js](api/airswapjs.md)
+    -   [Next Steps](api/next-steps.md)
 
--   API Server
+- Tutorial
 
-    -   [Introduction](serverAPI/introduction.md)
-    -   [Example](serverAPI/example.md)
-    -   [API](serverAPI/api.md)
+    -   [Maker](tutorials/maker/README.md)
 
+- Advanced
 
--   Widget
+    -   [WETH](advanced/weth.md)
+    -   [Approvals](advanced/approvals.md)
+    -   [API Server](advanced/api-server.md)
+    -   [WebSocket](advanced/websocket.md)
 
-    -   [Introduction](widget/introduction.md)
-    -   [Options](widget/options.md)
+- Apps by AirSwap
 
+    -   [Widget](dapps/widget.md)
+    -   [Instant](dapps/instant.md)
+    -   [Spaces](dapps/spaces.md)
+    -   [DexIndex](dapps/dexindex.md)
 
--   Tutorials
-
-    -   [Makers and Takers](tutorials/makers-and-takers.md)
-    -   [Building an Order Server](tutorials/order-server.md)
-    -   [Building a Trading Bot](tutorials/trading-bot.md)
-    -   [Geth Nodes](tutorials/geth-nodes.md)
-
--   In the Wild
+- Apps in the Wild
 
     -   [Community Maintained Projects](thirdPartyDevs/projects.md)
