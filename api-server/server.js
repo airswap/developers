@@ -6,9 +6,11 @@ if (!process.env.PRIVATE_KEY || !process.env.MAINNET) {
   throw new Error('must set PRIVATE_KEY and MAINNET environment variables')
 }
 
+const ORDER_SERVER_URL = process.env.ORDER_SERVER_URL || 'http://localhost:5004/getOrder'
+
 const app = express()
 app.use(express.json())
-app.listen(5005, () => console.log('API client server listening on port 5005!'))
+app.listen(5005, () => console.log('API client server listening on port 5005! Order server url: ' + ORDER_SERVER_URL))
 
 const airswap = new AirSwap({
   privateKey: process.env.PRIVATE_KEY,
@@ -24,15 +26,16 @@ const asyncMiddleware = fn => (req, res, next) => {
 }
 
 // Relay getOrder requests from other peers to the order server
-airswap.RPC_METHOD_ACTIONS.getOrder = msg => {
-  let { params } = msg
+airswap.RPC_METHOD_ACTIONS.getOrder = payload => {
+  const { message, sender, receiver } = payload
+  let { params } = message
   if (typeof params === 'string' && params.startsWith('-----BEGIN PGP MESSAGE-----')) {
-    params = airswap.decryptPGPMessage(params)
+    params = airswap.decryptMessage(params)
   }
   params.makerAddress = airswap.wallet.address
   rp({
     method: 'POST',
-    uri: 'http://localhost:5004/getOrder',
+    uri: ORDER_SERVER_URL,
     json: true,
     body: params,
   }).then(orderParams => {
@@ -42,7 +45,7 @@ airswap.RPC_METHOD_ACTIONS.getOrder = msg => {
       takerAddress: params.takerAddress,
     })
     airswap.call(
-      params.takerAddress, // send order to address who requested it
+      sender, // send order to address who requested it
       { id: msg.id, jsonrpc: '2.0', result: signedOrder }, // response id should match their `msg.id`
     )
   })
@@ -80,8 +83,12 @@ app.post(
   '/getOrder',
   asyncMiddleware(async (req, res) => {
     const { makerAddress, params } = req.body
-    const order = await airswap.getOrder(makerAddress, params)
-    sendResponse(res, order)
+    try {
+      const order = await airswap.getOrder(makerAddress, params)
+      sendResponse(res, order)
+    } catch (e) {
+      sendResponse(res, e.message)
+    }
   }),
 )
 
