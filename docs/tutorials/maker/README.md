@@ -57,7 +57,7 @@ Instantiate a Router. This is a helper that abstracts away all of the complexiti
 ```javascript
 const routerParams = {
   messageSigner,
-  address: wallet.address.toLowerCase(), // we lowercase all addresses in our system to reduce ambiguity,
+  address: wallet.address.toLowerCase(), // we lowercase all addresses in our system to reduce ambiguity
   keyspace: false,
   requireAuthentication: true, // it is possible for takers to connect to the router without signing, but they cannot set intents
 }
