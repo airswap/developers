@@ -35,7 +35,7 @@ Next, open a JavaScript file (app.js) and import ethers.js and AirSwap.js.
 
 ```javascript
 const ethers = require('ethers')
-const Router = require('AirSwap.js/src/protocolMessaging')
+const Router = require('airswap.js/src/protocolMessaging')
 ```
 
 We'll use ethers.js to import a private key using the wallet API.
@@ -57,8 +57,9 @@ Instantiate a Router. This is a helper that abstracts away all of the complexiti
 ```javascript
 const routerParams = {
   messageSigner,
-  address,
-  keyspace: false
+  address: wallet.address.toLowerCase(), // we lowercase all addresses in our system to reduce ambiguity
+  keyspace: false,
+  requireAuthentication: true, // it is possible for takers to connect to the router without signing, but they cannot set intents
 }
 const router = new Router(routerParams)
 ```
@@ -85,8 +86,8 @@ Use `router.setIntents()` to create intents. This action is idempotent and repla
 ```javascript
 await router.setIntents([
   {
-    makerToken: AST,
-    takerToken: ETH,
+    makerToken: 'AST',
+    takerToken: 'ETH',
     role: 'maker',
     supportedMethods: ["getOrder", "getQuote", "getMaxQuote"]
   }
