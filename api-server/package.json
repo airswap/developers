@@ -16,7 +16,8 @@
     "openpgp": "^4.2.1",
     "request": "^2.87.0",
     "request-promise": "^4.2.2",
-    "uuid4": "^1.0.0"
+    "uuid4": "^1.0.0",
+    "ws": "^7.0.0"
   },
   "devDependencies": {
     "eslint": "^5.16.0",
