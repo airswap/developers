@@ -36,6 +36,7 @@ Next, open a JavaScript file (app.js) and import ethers.js and AirSwap.js.
 ```javascript
 const ethers = require('ethers')
 const Router = require('airswap.js/src/protocolMessaging')
+const tokenMetadata = require('airswap.js/src/tokens')
 ```
 
 We'll use ethers.js to import a private key using the wallet API.
@@ -84,10 +85,12 @@ Let's create an Intent to sell AST for ETH. As we have learned, creating an inte
 Use `router.setIntents()` to create intents. This action is idempotent and replaces all other intents for your address. You call this method everytime your application starts. It should include the full list of intents. In your `main()` function:
 
 ```javascript
+await tokenMetadata.ready
+const { ETH, AST } = tokenMetadata.tokenAddressesBySymbol
 await router.setIntents([
   {
-    makerToken: 'AST',
-    takerToken: 'ETH',
+    makerToken: AST,
+    takerToken: ETH,
     role: 'maker',
     supportedMethods: ["getOrder", "getQuote", "getMaxQuote"]
   }
