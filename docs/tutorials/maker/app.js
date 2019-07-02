@@ -4,13 +4,15 @@ const TokenMetadata = require('AirSwap.js/src/tokens')
 const DeltaBalances = require('AirSwap.js/src/deltaBalances')
 
 const PK = process.env.PRIVATE_KEY
+const ENV = process.env.ENV
+if (!ENV) {
+  console.log(`Please set ENV='sandbox' to run against sandbox, by default it runs against production`)
+}
+
 if (!PK) {
   console.log('Please set the PRIVATE_KEY environment variable')
   process.exit(0)
 }
-
-const AST = '0xcc1cbd4f67cceb7c001bd4adf98451237a193ff8' // Rinkeby AST address
-const ETH = '0x0000000000000000000000000000000000000000'
 
 const wallet = new ethers.Wallet(PK)
 const address = wallet.address.toLowerCase()
@@ -18,8 +20,10 @@ const messageSigner = data => wallet.signMessage(data)
 const routerParams = {
   messageSigner,
   address,
-  keyspace: false
+  keyspace: false,
+  requireAuthentication: true
 }
+
 const router = new Router(routerParams)
 
 function priceTrade(params) {
@@ -158,7 +162,7 @@ async function main() {
 
     // Fetch token metadata
     await TokenMetadata.ready
-
+    const { ETH, AST } = TokenMetadata.tokenAddressesBySymbol
     // Set an intent to trade AST/ETH
     // Your wallet must have 250 AST to complete this step.
     // If you have Rinkeby ETH, you can buy Rinkeby AST at:

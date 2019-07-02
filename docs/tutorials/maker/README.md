@@ -9,7 +9,7 @@ In [Concepts](../getting-started/concepts.md), we learned about Makers and Taker
 * Receive order and quote requests
 * Craft, sign and send orders
 
-[View the code on GitHub](https://github.com/developers/tutorials/maker)
+[View the code on GitHub](https://github.com/airswap/developers/blob/master/docs/tutorials/maker/app.js)
 
 ## Requirements
 
