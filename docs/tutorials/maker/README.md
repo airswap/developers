@@ -21,11 +21,11 @@ In [Concepts](../getting-started/concepts.md), we learned about Makers and Taker
 
 ## Getting Started
 
-First, use the [Faucet](https://faucet.rinkeby.io/) to obtain Rinkeby ETH. Then, go to the [AirSwap Sandbox](https://sandbox.airswap.io) and obtain at least 250 Rinkeby AST.
+First, use the [Faucet](https://faucet.rinkeby.io/) to obtain Rinkeby ETH. Then, go to the [AirSwap Development Frontend](https://instant.development.airswap.io) and obtain at least 250 Rinkeby AST.
 
-Use ENV to control which environment to connect to. We'll use the `sandbox` for Rinkeby. You can use for `production` for Mainnet when you're ready to go live.
+Use ENV to control which environment to connect to. We'll use `development` for Rinkeby. You can `production` for Mainnet when you're ready to go live.
 
-`export ENV=sandbox`
+`export ENV=development`
 
 Next, create a new project and add [AirSwap.js](https://gitub.com/airswap/AirSwap.js).
 

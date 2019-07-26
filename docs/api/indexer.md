@@ -14,7 +14,7 @@ Indexer:
 
 ### Query Intents
 
-A list of all standing Intents can be found via the AirSwap HTTP API: [Mainnet](https://api.airswap.io/intents) or [Rinkeby](https://api.sandbox.airswap.io/intents). Each entry is grouped by makerToken and takerToken, and includes a list of all addresses with Intents to be a Maker for that pair.
+A list of all standing Intents can be found via the AirSwap HTTP API: [Mainnet](https://api.airswap.io/intents) or [Rinkeby](https://api.development.airswap.io/intents). Each entry is grouped by makerToken and takerToken, and includes a list of all addresses with Intents to be a Maker for that pair.
 
 ```json
 [

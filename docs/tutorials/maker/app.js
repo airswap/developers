@@ -6,7 +6,7 @@ const DeltaBalances = require('AirSwap.js/src/deltaBalances')
 const PK = process.env.PRIVATE_KEY
 const ENV = process.env.ENV
 if (!ENV) {
-  console.log(`Please set ENV='sandbox' to run against sandbox, by default it runs against production`)
+  console.log(`Please set ENV='development' to run against rinkeby, by default it runs against mainnet`)
 }
 
 if (!PK) {
@@ -166,7 +166,7 @@ async function main() {
     // Set an intent to trade AST/ETH
     // Your wallet must have 250 AST to complete this step.
     // If you have Rinkeby ETH, you can buy Rinkeby AST at:
-    // https://sandbox.airswap.io
+    // https://instant.development.airswap.io
     await router.setIntents([
       {
         makerToken: AST,
