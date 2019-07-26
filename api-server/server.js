@@ -46,7 +46,7 @@ airswap.RPC_METHOD_ACTIONS.getOrder = payload => {
     })
     airswap.call(
       sender, // send order to address who requested it
-      { id: msg.id, jsonrpc: '2.0', result: signedOrder }, // response id should match their `msg.id`
+      { id: message.id, jsonrpc: '2.0', result: signedOrder } // response id should match their `message.id`
     )
   })
 }
@@ -58,7 +58,7 @@ app.post(
     const { makerTokens, takerTokens, role = 'maker' } = req.body
     const intents = await airswap.findIntents(makerTokens, takerTokens, role)
     sendResponse(res, intents)
-  }),
+  })
 )
 
 app.post(
@@ -67,7 +67,7 @@ app.post(
     const { address } = req.body
     const intents = await airswap.getIntents(address)
     sendResponse(res, intents)
-  }),
+  })
 )
 
 app.post(
@@ -76,7 +76,7 @@ app.post(
     const intents = req.body.length ? req.body : null
     const data = await airswap.setIntents(intents)
     sendResponse(res, data)
-  }),
+  })
 )
 
 app.post(
@@ -89,7 +89,7 @@ app.post(
     } catch (e) {
       sendResponse(res, e.message)
     }
-  }),
+  })
 )
 
 app.post(
@@ -98,7 +98,7 @@ app.post(
     const { intents, makerAmount } = req.body
     const orders = await airswap.getOrders(intents, makerAmount)
     sendResponse(res, orders)
-  }),
+  })
 )
 
 app.post(
@@ -107,7 +107,7 @@ app.post(
     const { makerAddress, makerToken, takerToken, makerAmount, takerAmount } = req.body
     const quote = await airswap.getQuote({ makerAddress, makerToken, takerToken, makerAmount, takerAmount })
     sendResponse(res, quote)
-  }),
+  })
 )
 
 app.post(
@@ -116,7 +116,7 @@ app.post(
     const { makerAddress, makerToken, takerToken } = req.body
     const quote = await airswap.getMaxQuote({ makerAddress, makerToken, takerToken })
     sendResponse(res, quote)
-  }),
+  })
 )
 
 app.post('/signOrder', (req, res) => {
@@ -132,7 +132,7 @@ app.post('/signOrder', (req, res) => {
       takerToken,
       expiration,
       nonce,
-    }),
+    })
   )
 })
 
@@ -142,7 +142,7 @@ app.post(
     const { order, config } = req.body
     const tx = await airswap.fillOrder(order, config)
     sendResponse(res, tx)
-  }),
+  })
 )
 
 app.post(
@@ -151,7 +151,7 @@ app.post(
     const { amount, config } = req.body
     const tx = await airswap.unwrapWeth(amount, config)
     sendResponse(res, tx)
-  }),
+  })
 )
 
 app.post(
@@ -160,7 +160,7 @@ app.post(
     const { amount, config } = req.body
     const tx = await airswap.wrapWeth(amount, config)
     sendResponse(res, tx)
-  }),
+  })
 )
 
 app.post(
@@ -169,7 +169,7 @@ app.post(
     const { tokenContractAddr, config } = req.body
     const tx = await airswap.approveTokenForTrade(tokenContractAddr, config)
     sendResponse(res, tx)
-  }),
+  })
 )
 
 app.post(
@@ -177,7 +177,7 @@ app.post(
   asyncMiddleware(async (req, res) => {
     const tx = await airswap.registerPGPKey()
     sendResponse(res, tx)
-  }),
+  })
 )
 
 // Connect to AirSwap and listen for POSTs
