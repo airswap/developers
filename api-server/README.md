@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The AirSwap API Server aims to simplify your interaction with peers on the AirSwap network. The goal in creating this application is to abstract away some of the complexities of interacting with the Indexer over our messaging layer (https://connect.airswap-api.com/websocket). In doing so, the AirSwap API Server provides a more familiar REST API for getting/setting intents, approvals, submitting orders, etc. In addition, we have provided several reference implementations for an accompanying Order Server.
+The AirSwap API Server aims to simplify your interaction with peers on the AirSwap network. The goal in creating this application is to abstract away some of the complexities of interacting with the Indexer over our messaging layer (https://connect.airswap.io/websocket). In doing so, the AirSwap API Server provides a more familiar REST API for getting/setting intents, approvals, submitting orders, etc. In addition, we have provided several reference implementations for an accompanying Order Server.
 
 ### API Server + Order Server = Complete, one-click order maker solution
 
@@ -22,7 +22,7 @@ The separation of concerns between the API Server and Order Server provides a si
 
 ## Example
 
-1. In this example, we will make orders for AST/ETH. Setting an intent using the Indexer requires your wallet to hold 250 AST per token pair. To purchase AST on the Rinkeby network, head to the [Sandbox](https://sandbox.airswap.io/).
+1. In this example, we will make orders for AST/ETH. Setting an intent using the Indexer requires your wallet to hold 250 AST per token pair. To purchase AST on the Rinkeby network, head to the [development frontend](https://instant.development.airswap.io/).
 
 2.  Start the Client Server in Rinkeby mode with a private key:
 

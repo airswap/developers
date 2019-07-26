@@ -18,7 +18,7 @@ The following example will render a button that opens a Widget with a request to
 
 ```js
 AirSwap.Trader.render({
-  env: 'sandbox',
+  env: 'development',
   mode: 'buy',
   token: '0xcc1cbd4f67cceb7c001bd4adf98451237a193ff8',
   amount: 250 * (10 ** 4),
