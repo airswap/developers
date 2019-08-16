@@ -2,7 +2,7 @@ const ethers = require('ethers')
 const Router = require('AirSwap.js/src/protocolMessaging')
 const TokenMetadata = require('AirSwap.js/src/tokens')
 const DeltaBalances = require('AirSwap.js/src/deltaBalances')
-
+const Swap = require('AirSwap.js/src/swap')
 const PK = process.env.PRIVATE_KEY
 const ENV = process.env.ENV
 if (!ENV) {
@@ -27,30 +27,30 @@ const routerParams = {
 const router = new Router(routerParams)
 
 function priceTrade(params) {
-  // Assume a fixed price of 0.01 ETH/AST
+  // Assume a fixed price of 0.01 DAI/WETH
   // You should implement your own pricing logic here.
   const price = 0.01
 
-  let makerAmount
-  let takerAmount
+  let makerParam
+  let takerParam
 
-  if (params.makerAmount) {
+  if (params.makerParam) {
     // Maker amount specified, calculate the amount taker must send
-    makerAmount = params.makerAmount
-    const makerAmountDecimals = TokenMetadata.formatDisplayValueByToken({address: params.makerToken}, params.makerAmount)
-    const takerAmountDecimals = makerAmountDecimals * price
-    takerAmount = TokenMetadata.formatAtomicValueByToken({address: params.takerToken}, takerAmountDecimals)
-  } else if (params.takerAmount) {
+    makerParam = params.makerParam
+    const makerParamDecimals = TokenMetadata.formatDisplayValueByToken({address: params.makerToken}, params.makerParam)
+    const takerParamDecimals = makerParamDecimals * price
+    takerParam = TokenMetadata.formatAtomicValueByToken({address: params.takerToken}, takerParamDecimals)
+  } else if (params.takerParam) {
     // Taker amount specified, calculate the amount maker must send
-    takerAmount = params.takerAmount
-    const takerAmountDecimals = TokenMetadata.formatDisplayValueByToken({address: params.takerToken}, params.takerAmount)
-    const makerAmountDecimals = takerAmountDecimals / price
-    makerAmount = TokenMetadata.formatAtomicValueByToken({address: params.makerToken}, makerAmountDecimals)
+    takerParam = params.takerParam
+    const takerParamDecimals = TokenMetadata.formatDisplayValueByToken({address: params.takerToken}, params.takerParam)
+    const makerParamDecimals = takerParamDecimals / price
+    makerParam = TokenMetadata.formatAtomicValueByToken({address: params.makerToken}, makerParamDecimals)
   }
 
   return {
-    makerAmount,
-    takerAmount
+    makerParam,
+    takerParam
   }
 }
 
@@ -58,22 +58,21 @@ async function getOrder(payload) {
   const { params } = payload.message
 
   // Price the order
-  const { makerAmount, takerAmount } = priceTrade(params)
+  const { makerParam, takerParam } = priceTrade(params)
 
   // Construct the order
-  order = {
-    makerAmount: Number(makerAmount).toString(),
-    takerAmount: Number(takerAmount).toString(),
+  const order = {
+    nonce: Date.now(),
+    makerWallet: address,
+    takerWallet: params.takerWallet,
+    makerParam: Number(makerParam).toString(),
+    takerParam: Number(takerParam).toString(),
     makerToken: params.makerToken,
     takerToken: params.takerToken,
-    takerAddress: params.takerAddress,
-    makerAddress: address,
-    nonce: Number(Math.random() * 100000).toFixed().toString(),
-    expiration: Math.round(new Date().getTime()/ 1000) + 300 // Expire after 5 minutes
+    expiry: Math.round(new Date().getTime()/ 1000) + 300 // Expire after 5 minutes
   }
-
   // Sign the order
-  const signedOrder = await signOrder(order)
+  const signedOrder = await Swap.signSwap(order)
 
   // Construct a JSON RPC response
   response = {
@@ -91,15 +90,15 @@ async function getQuote(payload) {
   const { params } = payload.message
 
   // Price the quote
-  const { makerAmount, takerAmount } = priceTrade(params)
+  const { makerParam, takerParam } = priceTrade(params)
 
   // Construct the quote
-  quote = {
-    makerAmount: Number(makerAmount).toString(),
-    takerAmount: Number(takerAmount).toString(),
+  const quote = {
+    makerParam: Number(makerParam).toString(),
+    takerParam: Number(takerParam).toString(),
     makerToken: params.makerToken,
     takerToken: params.takerToken,
-    makerAddress: address,
+    makerWallet: address,
   }
 
   // Construct a JSON RPC response
@@ -123,24 +122,15 @@ async function getMaxQuote(payload) {
   // Get our token balances to see how much liquidity we have available
   const balances = await DeltaBalances.getManyBalancesManyAddresses([params.makerToken], [address])
   const makerTokenBalance = balances[address][params.makerToken]
-  const takerTokenBalance = balances[address][params.takerToken]
 
-  // Set the maker or taker amount depending on the available balance
-  if (TokenMetadata.tokenSymbolsByAddress[params.takerToken] == 'ETH') {
-    params.makerAmount = makerTokenBalance
-  } else if (TokenMetadata.tokenSymbolsByAddress[params.makerToken == 'WETH']) {
-    params.takerAmount = takerTokenBalance
-  } else {
-    // We can't make this trade. It'd be a good idea to send a response here but none is required.
-    return
-  }
+  params.makerParam = makerTokenBalance
 
   // Price the trade for the maximum amount
-  const { makerAmount, takerAmount } = priceTrade(params)
+  const { makerParam, takerParam } = priceTrade(params)
   const quote = {
     ...params,
-    makerAmount,
-    takerAmount
+    makerParam,
+    takerParam
   }
 
   // Construct a JSON RPC response
@@ -163,20 +153,24 @@ async function main() {
 
     // Fetch token metadata
     await TokenMetadata.ready
-    const { ETH, AST } = TokenMetadata.tokenAddressesBySymbol
-    // Set an intent to trade AST/ETH
-    // Your wallet must have 250 AST to complete this step.
-    // If you have Rinkeby ETH, you can buy Rinkeby AST at:
+    const { WETH, DAI } = TokenMetadata.tokenAddressesBySymbol
+    // Set an intent to trade DAI/WETH
+    // Your wallet must have 250 DAI to complete this step.
+    // If you have Rinkeby ETH, you can buy Rinkeby DAI at:
     // https://instant.development.airswap.io
-    await router.setIntents([
-      {
-        makerToken: AST,
-        takerToken: ETH,
-        role: 'maker',
-        supportedMethods: ["getOrder", "getQuote", "getMaxQuote"]
-      }
-    ]).then(() => {
-      console.log('setIntents for AST/ETH')
+
+  const intents = [
+    {
+      makerToken: WETH,
+      takerToken: DAI,
+      role: 'maker',
+      supportedMethods: ["getOrder", "getQuote", "getMaxQuote"],
+      swapVersion: 2
+    }
+  ]
+
+    await router.setIntents(intents).then((resp) => {
+      console.log('setIntents for DAI/ETH', resp, JSON.stringify(intents, null, 2), address)
     }).catch(e => {
       console.log('unable to setIntents', e)
     })
@@ -185,37 +179,6 @@ async function main() {
     router.RPC_METHOD_ACTIONS['getOrder'] = getOrder
     router.RPC_METHOD_ACTIONS['getQuote'] = getQuote
     router.RPC_METHOD_ACTIONS['getMaxQuote'] = getMaxQuote
-}
-
-async function signOrder({ makerAddress, makerAmount, makerToken, takerAddress, takerAmount, takerToken, expiration, nonce }) {
-  const types = [
-    'address', // makerAddress
-    'uint256', // makerAmount
-    'address', // makerToken
-    'address', // takerAddress
-    'uint256', // takerAmount
-    'address', // takertoken
-    'uint256', // expiration
-    'uint256', // nonce
-  ]
-  const hashedOrder = ethers.utils.solidityKeccak256(types, [
-    makerAddress,
-    makerAmount,
-    makerToken,
-    takerAddress,
-    takerAmount,
-    takerToken,
-    expiration,
-    nonce,
-  ])
-
-  const signedMsg = await wallet.signMessage(ethers.utils.arrayify(hashedOrder))
-  const sig = ethers.utils.splitSignature(signedMsg)
-
-  return {
-    ...order,
-    ...sig
-  }
 }
 
 main()

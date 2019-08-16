@@ -14,7 +14,7 @@ The API Server implements AirSwap.js to provide a REST HTTP API for interacting 
 
 ## Example
 
-1. In this example, we will make orders for AST/ETH. Setting an intent using the Indexer requires your wallet to hold 250 AST per token pair. To purchase AST on the Rinkeby network, head to the [Sandbox](https://sandbox.airswap.io/).
+1. In this example, we will make orders for AST/ETH. Setting an intent using the Indexer requires your wallet to hold 250 AST per token pair. To purchase AST on the Rinkeby network, head to the [development frontend](https://instant.development.airswap.io/).
 
 2.  Start the Client Server in Rinkeby mode with a private key:
 

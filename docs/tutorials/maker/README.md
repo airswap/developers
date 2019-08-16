@@ -9,7 +9,7 @@ In [Concepts](../getting-started/concepts.md), we learned about Makers and Taker
 * Receive order and quote requests
 * Craft, sign and send orders
 
-[View the code on GitHub](https://github.com/developers/tutorials/maker)
+[View the code on GitHub](https://github.com/airswap/developers/blob/master/docs/tutorials/maker/app.js)
 
 ## Requirements
 
@@ -21,11 +21,11 @@ In [Concepts](../getting-started/concepts.md), we learned about Makers and Taker
 
 ## Getting Started
 
-First, use the [Faucet](https://faucet.rinkeby.io/) to obtain Rinkeby ETH. Then, go to the [AirSwap Sandbox](https://sandbox.airswap.io) and obtain at least 250 Rinkeby AST.
+First, use the [Faucet](https://faucet.rinkeby.io/) to obtain Rinkeby ETH. Then, go to the [AirSwap Development Frontend](https://instant.development.airswap.io) and obtain at least 250 Rinkeby AST.
 
-Use ENV to control which environment to connect to. We'll use the `sandbox` for Rinkeby. You can use for `production` for Mainnet when you're ready to go live.
+Use ENV to control which environment to connect to. We'll use `development` for Rinkeby. You can `production` for Mainnet when you're ready to go live.
 
-`export ENV=sandbox`
+`export ENV=development`
 
 Next, create a new project and add [AirSwap.js](https://gitub.com/airswap/AirSwap.js).
 
@@ -35,7 +35,8 @@ Next, open a JavaScript file (app.js) and import ethers.js and AirSwap.js.
 
 ```javascript
 const ethers = require('ethers')
-const Router = require('AirSwap.js/src/protocolMessaging')
+const Router = require('airswap.js/src/protocolMessaging')
+const tokenMetadata = require('airswap.js/src/tokens')
 ```
 
 We'll use ethers.js to import a private key using the wallet API.
@@ -57,8 +58,9 @@ Instantiate a Router. This is a helper that abstracts away all of the complexiti
 ```javascript
 const routerParams = {
   messageSigner,
-  address,
-  keyspace: false
+  address: wallet.address.toLowerCase(), // we lowercase all addresses in our system to reduce ambiguity
+  keyspace: false,
+  requireAuthentication: true, // it is possible for takers to connect to the router without signing, but they cannot set intents
 }
 const router = new Router(routerParams)
 ```
@@ -83,6 +85,8 @@ Let's create an Intent to sell AST for ETH. As we have learned, creating an inte
 Use `router.setIntents()` to create intents. This action is idempotent and replaces all other intents for your address. You call this method everytime your application starts. It should include the full list of intents. In your `main()` function:
 
 ```javascript
+await tokenMetadata.ready
+const { ETH, AST } = tokenMetadata.tokenAddressesBySymbol
 await router.setIntents([
   {
     makerToken: AST,
