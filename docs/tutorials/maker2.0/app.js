@@ -20,12 +20,7 @@ if (!PK) {
   process.exit(0)
 }
 
-
-
 const wallet = new ethers.Wallet(PK)
-
-console.log('test', wallet.signMessage)
-
 const address = wallet.address.toLowerCase()
 const messageSigner = data => wallet.signMessage(data)
 const routerParams = {
