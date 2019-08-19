@@ -33,7 +33,7 @@ const routerParams = {
 const router = new Router(routerParams)
 
 function priceTrade(params) {
-  // Assume a fixed price of 0.01 DAI/WETH
+  // Assume a fixed price of 200 DAI/WETH
   // You should implement your own pricing logic here.
   const price = 200
 
@@ -53,8 +53,7 @@ function priceTrade(params) {
     const makerParamDecimals = takerParamDecimals / price
     makerParam = TokenMetadata.formatAtomicValueByToken({address: params.makerToken}, makerParamDecimals)
   }
-  console.log('PRICED TRADE', makerParam,
-    takerParam)
+
   return {
     makerParam,
     takerParam
