@@ -1,3 +1,5 @@
+const dotenv = require('dotenv')
+dotenv.config()
 const ethers = require('ethers')
 const Router = require('AirSwap.js/src/protocolMessaging')
 const TokenMetadata = require('AirSwap.js/src/tokens')
@@ -5,6 +7,10 @@ const DeltaBalances = require('AirSwap.js/src/deltaBalances')
 const Swap = require('AirSwap.js/src/swap')
 const PK = process.env.PRIVATE_KEY
 const ENV = process.env.ENV
+
+const makerSymbol = 'WETH'
+const takerSymbol = 'DAI'
+
 if (!ENV) {
   console.log(`Please set ENV='development' to run against rinkeby, by default it runs against mainnet`)
 }
@@ -14,7 +20,12 @@ if (!PK) {
   process.exit(0)
 }
 
+
+
 const wallet = new ethers.Wallet(PK)
+
+console.log('test', wallet.signMessage)
+
 const address = wallet.address.toLowerCase()
 const messageSigner = data => wallet.signMessage(data)
 const routerParams = {
@@ -29,7 +40,7 @@ const router = new Router(routerParams)
 function priceTrade(params) {
   // Assume a fixed price of 0.01 DAI/WETH
   // You should implement your own pricing logic here.
-  const price = 0.01
+  const price = 200
 
   let makerParam
   let takerParam
@@ -47,7 +58,8 @@ function priceTrade(params) {
     const makerParamDecimals = takerParamDecimals / price
     makerParam = TokenMetadata.formatAtomicValueByToken({address: params.makerToken}, makerParamDecimals)
   }
-
+  console.log('PRICED TRADE', makerParam,
+    takerParam)
   return {
     makerParam,
     takerParam
@@ -65,14 +77,14 @@ async function getOrder(payload) {
     nonce: Date.now(),
     makerWallet: address,
     takerWallet: params.takerWallet,
-    makerParam: Number(makerParam).toString(),
-    takerParam: Number(takerParam).toString(),
+    makerParam: makerParam,
+    takerParam: takerParam,
     makerToken: params.makerToken,
     takerToken: params.takerToken,
     expiry: Math.round(new Date().getTime()/ 1000) + 300 // Expire after 5 minutes
   }
   // Sign the order
-  const signedOrder = await Swap.signSwap(order)
+  const signedOrder = await Swap.signSwap(order, wallet)
 
   // Construct a JSON RPC response
   response = {
@@ -94,8 +106,8 @@ async function getQuote(payload) {
 
   // Construct the quote
   const quote = {
-    makerParam: Number(makerParam).toString(),
-    takerParam: Number(takerParam).toString(),
+    makerParam: makerParam,
+    takerParam: takerParam,
     makerToken: params.makerToken,
     takerToken: params.takerToken,
     makerWallet: address,
@@ -130,7 +142,8 @@ async function getMaxQuote(payload) {
   const quote = {
     ...params,
     makerParam,
-    takerParam
+    takerParam,
+    makerWallet: address
   }
 
   // Construct a JSON RPC response
@@ -146,39 +159,41 @@ async function getMaxQuote(payload) {
 }
 
 async function main() {
-    // Connect and authenticate with the AirSwap Websocket
-    await router.connect().catch(e => {
-      console.log('unable to connect to Websocket', e)
-    })
+  // Connect and authenticate with the AirSwap Websocket
+  await router.connect().catch(e => {
+    console.log('unable to connect to Websocket', e)
+  })
 
-    // Fetch token metadata
-    await TokenMetadata.ready
-    const { WETH, DAI } = TokenMetadata.tokenAddressesBySymbol
-    // Set an intent to trade DAI/WETH
-    // Your wallet must have 250 DAI to complete this step.
-    // If you have Rinkeby ETH, you can buy Rinkeby DAI at:
-    // https://instant.development.airswap.io
+  // Fetch token metadata
+  await TokenMetadata.ready
+  const makerToken = TokenMetadata.tokenAddressesBySymbol[makerSymbol]
+  const takerToken = TokenMetadata.tokenAddressesBySymbol[takerSymbol]
+
+  // Set an intent to trade DAI/WETH
+  // Your wallet must have 250 DAI to complete this step.
+  // If you have Rinkeby ETH, you can buy Rinkeby DAI at:
+  // https://instant.development.airswap.io
 
   const intents = [
     {
-      makerToken: WETH,
-      takerToken: DAI,
+      makerToken,
+      takerToken,
       role: 'maker',
       supportedMethods: ["getOrder", "getQuote", "getMaxQuote"],
       swapVersion: 2
     }
   ]
 
-    await router.setIntents(intents).then((resp) => {
-      console.log('setIntents for DAI/ETH', resp, JSON.stringify(intents, null, 2), address)
-    }).catch(e => {
-      console.log('unable to setIntents', e)
-    })
+  await router.setIntents(intents).then((resp) => {
+    console.log(`setIntents for ${makerSymbol}/${takerSymbol}`, resp, JSON.stringify(intents, null, 2), address)
+  }).catch(e => {
+    console.log('unable to setIntents', e)
+  })
 
-    // Set handlers for quotes
-    router.RPC_METHOD_ACTIONS['getOrder'] = getOrder
-    router.RPC_METHOD_ACTIONS['getQuote'] = getQuote
-    router.RPC_METHOD_ACTIONS['getMaxQuote'] = getMaxQuote
+  // Set handlers for quotes
+  router.RPC_METHOD_ACTIONS['getOrder'] = getOrder
+  router.RPC_METHOD_ACTIONS['getQuote'] = getQuote
+  router.RPC_METHOD_ACTIONS['getMaxQuote'] = getMaxQuote
 }
 
 main()

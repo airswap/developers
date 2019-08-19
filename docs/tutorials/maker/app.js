@@ -115,7 +115,6 @@ async function getQuote(payload) {
 }
 
 async function getMaxQuote(payload) {
-  console.log(payload)
   // This method is called in order for you to signal the largest trade you can provide
   // It is a vital indicator of maximum liquidity in the AirSwap ecosystem.
   const { params } = payload.message
