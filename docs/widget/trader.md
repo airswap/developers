@@ -6,7 +6,8 @@ The AirSwap Trader Widget is an embeddable, HTML+JavaScript element that can be 
 
 !> Pop-up blockers can prevent the AirSwap Trader Widget from loading properly.
 
-### Setup
+### Usage
+#### Setup
 Add this to your index.html or respective file to load the widget script.
 
 ```html
@@ -14,8 +15,6 @@ Add this to your index.html or respective file to load the widget script.
     <script src="https://cdn.airswap.io/gallery/airswap-trader-widget.js"></script>
 </head>
 ```
-
-### Usage
 
 #### Creating an empty order builder
 Add the following code to where you want to open the widget. The onCreate callback function is triggered once the user successfully creates an order. The order details, signature and cid (ipfs hash) are passed as arguments.
