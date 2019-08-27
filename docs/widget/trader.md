@@ -17,8 +17,6 @@ Add this to your index.html or respective file to load the widget.
 
 ### Examples {docsify-ignore}
 
-<!-- The following example will render a button that opens a Widget with a request to buy AST. You can try it out here: [JSFiddle](https://jsfiddle.net/ucra2tsq/). -->
-
 Add the following code to where you want to open the widget. The onCreate callback function is triggered once the user successfully creates an order. The order details, signature and cid (ipfs hash) are passed as arguments.
 
 ```js
@@ -44,7 +42,6 @@ window.AirSwapTrader.render(
       makerParam: 3,
       takerToken: '0xc778417e063141139fce010982780140aa0cd5ab',
       takerParam: 12,
-      takerWallet: '0x1ffb1788e56a755a74d3b63a787b09b65ca35e12',
     },
     onCreate: (order, signature, cid) => {
       console.log('Order created!')
@@ -72,6 +69,8 @@ window.AirSwapTrader.render(
       nonce: 1566243261795
     },
     signature: {
+      version: '0x01',
+      signer: '0x1ffb1788e56a755a74d3b63a787b09b65ca35e12',
       r: '0xec5aac45d8d9fb9f1b32206db8ca5745bef0ff6cca4e10f96891712932674144',
       s: '0x74b363b16641a9cf51c8cad2e3b26bfcaec825b32122aeb41dce3db24ad90ec4',
       v: 28,
@@ -119,8 +118,19 @@ window.AirSwapTrader.render(
 
 
 #### signature `signatureType (object)`, `optional`
+```js
+signature: {
+  version: '0x01',
+  signer: '0x1ffb1788e56a755a74d3b63a787b09b65ca35e12',
+  r: '0xec5aac45d8d9fb9f1b32206db8ca5745bef0ff6cca4e10f96891712932674144',
+  s: '0x74b363b16641a9cf51c8cad2e3b26bfcaec825b32122aeb41dce3db24ad90ec4',
+  v: 28,
+}
+```
 | Type | Key | Description |
 | ----------- | ----------- | ----------- |
+| string | `version` | `required` - Sets the maker token address. Defaults to DAI |
+| string | `signer` | `required` - Sets the maker token address. Defaults to DAI |
 | string | `r` | `required` - Sets the maker token address. Defaults to DAI |
 | string | `s` | `required` - Sets the maker param. This can either be an amount of ERC-20 tokens or ID of ERC-721 tokens |
 | number | `v` | `required` - Sets the maker token address. Defaults to DAI |
@@ -140,9 +150,9 @@ function onCreate(order, signature, cid) {
 ```
 | Type | Parameter | Description |
 | ----------- | ----------- | ----------- |
-| object | `order` | The [order details](#order-ordertype-object-optional)
-| object | `signature` | The [order signature](#signature-signaturetype-object-optional)
-| string | `cid` | The [IPFS hash](#cid-string-optional) of the order
+| object | `order` | The [order details](#order-ordertype-object-optional) |
+| object | `signature` | The [order signature](#signature-signaturetype-object-optional) |
+| string | `cid` | The [IPFS hash](#cid-string-optional) of the order |
 
 
 #### onSwap `Function`, `optional`

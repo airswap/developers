@@ -25,7 +25,7 @@
 - Embeddable Widgets
 
     -   [Instant](dapps/widget.md)
-    -   [Trader](dapps/trader-widget.md)
+    -   [Trader](widget/trader.md)
 
 - Apps by AirSwap
 
