@@ -29,7 +29,6 @@
 
 - Apps by AirSwap
 
-    -   [Widget](dapps/widget.md)
     -   [Instant](dapps/instant.md)
     -   [Spaces](dapps/spaces.md)
     -   [DexIndex](dapps/dexindex.md)
