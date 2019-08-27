@@ -17,6 +17,7 @@ Add this to your index.html or respective file to load the widget script.
 
 ### Usage
 
+#### Creating an empty order builder
 Add the following code to where you want to open the widget. The onCreate callback function is triggered once the user successfully creates an order. The order details, signature and cid (ipfs hash) are passed as arguments.
 
 ```js
@@ -32,8 +33,12 @@ window.AirSwapTrader.render(
   'body',
 )
 ```
-\
-If you want to pre-fill some of the data in the trade builder, you can add an order object to the parameters. Providing a value in the object will lock the corresponding field in the widget, preventing the user from changing the value.
+
+Hurray! You will now see an empty trade builder.
+![Empty Trader View](../assets/widget/build-order.png)
+
+#### Pre-filling values in the order builder
+In many cases, you would want to set a desired token and amount. To do so, you can add an order object to the widget options. Providing a value in the object will lock the corresponding field in the widget, preventing the user from changing the value.
 ```js
 window.AirSwapTrader.render(
   {
@@ -53,7 +58,10 @@ window.AirSwapTrader.render(
   'body',
 )
 ```
-\
+Now, you can see that the token and amount for the taker and maker has been set and locked.
+![Filled Trader View](../assets/widget/filled-build-order.png)
+
+#### Creating a Taker Flow
 To render a take order screen, add the full order and signature objects to the options. The onSwap callback function will be triggered when the taker fills the order and passes the hash of the transaction as an argument.
 ```js
 window.AirSwapTrader.render(
@@ -85,6 +93,7 @@ window.AirSwapTrader.render(
   'body',
 )
 ```
+![Taker View](../assets/widget/taker-view.png)
 \
 If you have the full signed order details stored in IPFS (Inter Planetary File System), you can just use the IPFS hash instead.
 ```js
