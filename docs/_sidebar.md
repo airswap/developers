@@ -22,6 +22,11 @@
     -   [API Server](advanced/api-server.md)
     -   [WebSocket](advanced/websocket.md)
 
+- Embeddable Widgets
+
+    -   [Instant](dapps/widget.md)
+    -   [Trader](dapps/trader-widget.md)
+
 - Apps by AirSwap
 
     -   [Widget](dapps/widget.md)
