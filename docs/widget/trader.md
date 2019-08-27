@@ -6,7 +6,8 @@ The AirSwap Trader Widget is an embeddable, HTML+JavaScript element that can be 
 
 !> Pop-up blockers can prevent the AirSwap Trader Widget from loading properly.
 
-### Setup
+### Usage
+#### Setup
 Add this to your index.html or respective file to load the widget script.
 
 ```html
@@ -14,8 +15,6 @@ Add this to your index.html or respective file to load the widget script.
     <script src="https://cdn.airswap.io/gallery/airswap-trader-widget.js"></script>
 </head>
 ```
-
-### Usage
 
 #### Creating an empty order builder
 Add the following code to where you want to open the widget. The `onCreate` callback function is triggered once the user successfully creates an order. The order details, signature and cid (ipfs hash) are passed as arguments.
@@ -44,9 +43,10 @@ window.AirSwapTrader.render(
   {
     order: {
       makerToken: '0xce787654722aed819d7a8073576d2b2b359641b5',
-      makerParam: '1000000000000000000',
+      makerParam: '10000000000000000000',
       takerToken: '0xc778417e063141139fce010982780140aa0cd5ab',
       takerParam: '10000000000000000',
+      expiry: 1567026510,
     },
     onCreate: (order, signature, cid) => {
       console.log('Order created!')
@@ -68,12 +68,12 @@ window.AirSwapTrader.render(
   {
     order: {
       makerToken: '0xce787654722aed819d7a8073576d2b2b359641b5',
-      makerParam: '1000000000000000000',
+      makerParam: '10000000000000000000',
       makerWallet: '0xd68bb3350887ed3ee128b5ac4b7d852e24c5d366',
       takerToken: '0xc778417e063141139fce010982780140aa0cd5ab',
       takerParam: '10000000000000000',
       takerWallet: '0x0000000000000000000000000000000000000000',
-      expiry: 1567024230,
+      expiry: 1567026510,
       nonce: 1566932032583
     },
     signature: {
@@ -93,7 +93,6 @@ window.AirSwapTrader.render(
   'body',
 )
 ```
-![Taker View](../assets/widget/taker-view.png)
 \
 If you have the full signed order details stored in [IPFS](https://ipfs.io), you can use the IPFS hash instead.
 ```js
@@ -110,6 +109,7 @@ window.AirSwapTrader.render(
   'body',
 )
 ```
+![Taker View](../assets/widget/taker-view.png)
 
 ## Options
 
@@ -135,7 +135,7 @@ order: {
 | string | `takerToken` | `optional` - Sets the taker token address. Defaults to ETH |
 | string | `takerParam` | `optional` - Sets the taker param. This can either be an atomic amount of ERC-20 tokens or ID of an ERC-721 token |
 | string | `takerWallet` | `optional` - Sets the taker wallet address. This value is only used when you have a signed order for the user to take. Only used when providing a signed order. |
-| int | `expiry` | `optional` - Unix timestamp of order expiry. |
+| int | `expiry` | `optional` - UTC timestamp of order expiry in **seconds**. |
 | string | `nonce` | `optional` - Nonce of the order. Only used when providing a signed order. |
 
 
