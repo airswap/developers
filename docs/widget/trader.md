@@ -18,7 +18,7 @@ Add this to your index.html or respective file to load the widget script.
 ### Usage
 
 #### Creating an empty order builder
-Add the following code to where you want to open the widget. The onCreate callback function is triggered once the user successfully creates an order. The order details, signature and cid (ipfs hash) are passed as arguments.
+Add the following code to where you want to open the widget. The `onCreate` callback function is triggered once the user successfully creates an order. The order details, signature and cid (ipfs hash) are passed as arguments.
 
 ```js
 window.AirSwapTrader.render(
@@ -38,7 +38,7 @@ Hurray! You will now see an empty trade builder.
 ![Empty Trader View](../assets/widget/build-order.png)
 
 #### Pre-filling values in the order builder
-In many cases, you would want to set a desired token and amount. To do so, you can add an order object to the widget options. Providing a value in the object will lock the corresponding field in the widget, preventing the user from changing the value.
+In many cases, you would want to set a desired token and amount. To do so, you can add an order object to the widget options. Passing a value in the object will lock the corresponding field in the widget, preventing the user from changing the value.
 ```js
 window.AirSwapTrader.render(
   {
@@ -62,7 +62,7 @@ Now, you can see that the token and amount for the taker and maker has been set 
 ![Filled Trader View](../assets/widget/filled-build-order.png)
 
 #### Creating a Taker Flow
-To render a take order screen, add the full order and signature objects to the options. The onSwap callback function will be triggered when the taker fills the order and passes the hash of the transaction as an argument.
+To initiate the Taker flow you would need to pass the full order and signature objects. The `onSwap` callback function will be triggered when the taker fills the order and passes the hash of the transaction as an argument.
 ```js
 window.AirSwapTrader.render(
   {
@@ -95,7 +95,7 @@ window.AirSwapTrader.render(
 ```
 ![Taker View](../assets/widget/taker-view.png)
 \
-If you have the full signed order details stored in IPFS (Inter Planetary File System), you can just use the IPFS hash instead.
+If you have the full signed order details stored in [IPFS](https://ipfs.io), you can use the IPFS hash instead.
 ```js
 window.AirSwapTrader.render(
   {
@@ -160,16 +160,16 @@ signature: {
 
 
 #### cid `string`, `optional`
-IPFS (Inter Planetary File System) hash for the order. If provided, the widget will fetch the order details from IPFS and display a take order screen.
+[IPFS](https://ipfs.io) hash for the order. If provided, the widget will fetch the order details from IPFS and display a take order screen.
 
 
 #### onCreate `Function`, `optional`
-Callback function triggered on creation of the trade. Passes the order, signature, and cid to the function as arguments.
+Callback function triggered on creation of a trade. Passes the order, signature, and cid to the function as arguments.
 ```js
 function onCreate(order, signature, cid) {
     console.log('Order Created!');
     ...
-} 
+}
 ```
 | Type | Parameter | Description |
 | ----------- | ----------- | ----------- |
@@ -179,12 +179,12 @@ function onCreate(order, signature, cid) {
 
 
 #### onSwap `Function`, `optional`
-Callback function triggered on successful trade. Passes the transaction hash of the fill event as an argument.
+Callback function triggered on a successful trade. Passes the transaction hash of the fill event as an argument.
 ```js
 function onSwap(transactionHash) {
     console.log('Trade Completed!');
     ...
-} 
+}
 ```
 | Type | Parameter | Description |
 | ----------- | ----------- | ----------- |
@@ -192,12 +192,12 @@ function onSwap(transactionHash) {
 
 
 #### onCancel `Function`, `optional`
-Callback function triggered on cancel of the trade. Passes the transaction hash of the cancellation event as an argument.
+Callback function triggered when a trade is canceled. Passes the transaction hash of the cancellation event as an argument.
 ```js
 function onCancel(transactionHash) {
     console.log('Trade Cancelled!');
     ...
-} 
+}
 ```
 | Type | Parameter | Description |
 | ----------- | ----------- | ----------- |
