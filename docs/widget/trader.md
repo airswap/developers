@@ -1,7 +1,5 @@
 # Trader Widget
 
-![AirSwap Widget](../assets/dapps/widget.1.gif)
-
 The AirSwap Trader Widget is an embeddable, HTML+JavaScript element that can be dropped into any webpage to share and settle over-the-counter trades with no counterparty risk, no deposits, and no fees.
 
 !> Pop-up blockers can prevent the AirSwap Trader Widget from loading properly.
