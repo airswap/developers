@@ -47,7 +47,7 @@ AirSwapInstant.render(
 )
 ```
 
-Alternatively, instead of passing an empty object like in the example above, you can pass a configuration object using the options described below.
+The configuration object accepts the options described below.
 
 #### env `string`, `optional`
 
