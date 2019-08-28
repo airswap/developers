@@ -39,7 +39,12 @@ AirSwapInstant.render(
 The simplest way to use the `AirSwapInstant` widget is by rendering it without any custom configuration options. This will open the widget and allow the user to buy or sell any amount of any token.
 
 ```js
-AirSwapInstant.render({}, 'body')
+AirSwapInstant.render(
+  {
+    onClose: function noop() {},
+  },
+  'body',
+)
 ```
 
 Alternatively, instead of passing an empty object like in the example above, you can pass a configuration object using the options described below.
@@ -56,7 +61,7 @@ Either `buy` or `sell`. If specified, the user will not be able to change the mo
 
 The hex address of the token to swap in exchange for ETH. You can find a full list of indexed token metadata for: [Mainnet](https://token-metadata.airswap.io/tokens) or [Rinkeby](https://token-metadata.airswap.io/rinkebyTokens). If specified, the user will not be able to search for any other tokens in the widget.
 
-!> If you pass a hex address that is not included in AirSwap token metadata, the widget will not work.
+!> If you pass a hex address that is not included in AirSwap token metadata, the widget will not work. It will crash like in the image below!
 
 #### amount `string`, `optional`
 
@@ -72,9 +77,9 @@ function onComplete(transactionId) {
 }
 ```
 
-#### onClose `function`, `optional`
+#### onClose `function`, `required`
 
-A function called when the user clicks the "X" to dismiss the widget. No arguments are passed.
+This is the only mandatory parameter. A function called when the user clicks the "X" to dismiss the widget. No arguments are passed.
 
 ```js
 function onClose() {
