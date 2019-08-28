@@ -12,12 +12,12 @@ Add this to your index.html or respective file to load the widget script.
 
 ```html
 <head>
-    <script src="https://cdn.airswap.io/gallery/airswap-trader-widget.js"></script>
+    <script src="https://cdn.airswap.io/airswap-trader.js"></script>
 </head>
 ```
 
 #### Creating an empty order builder
-Add the following code to where you want to open the widget. The `onCreate` callback function is triggered once the user successfully creates an order. The order details, signature and cid (ipfs hash) are passed as arguments.
+Add the following code to where you want to open the widget. The `onCreate` callback function is triggered once the user successfully creates an order. The [order details](#order-ordertype-object-optional), [signature](#signature-signaturetype-object-optional) and [cid](#cid-string-optional) (ipfs hash) are passed as arguments.
 
 ```js
 window.AirSwapTrader.render(
@@ -32,6 +32,22 @@ window.AirSwapTrader.render(
   'body',
 )
 ```
+<button class="open-widget" id="open-trader-widget-1" onClick="(function() {
+  const button = document.getElementById('open-trader-widget-1');
+  button.disabled = true;
+  window.AirSwapTrader.render(
+    {
+      onCreate: (order, signature, cid) => {
+        console.log('Order Created!');
+      },
+      onClose: () => {
+        console.log('Widget Closed');
+        button.disabled = false;
+      },
+    },
+    'body',
+  )
+})()">Demo</button>
 
 Hurray! You will now see an empty order builder.
 ![Empty Trader View](../assets/widget/build-order.png)
@@ -46,7 +62,7 @@ window.AirSwapTrader.render(
       makerParam: '10000000000000000000', // Atomic value for 10 DAI
       takerToken: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
       takerParam: '10000000000000000', // Atomic value for 0.01 WETH
-      expiry: 1567026510, // Expiration date in seconds - Note: This is 24 hours past from the time of writing
+      expiry: 1707026510, // Expiration date in seconds
     },
     onCreate: (order, signature, cid) => {
       console.log('Order created!')
@@ -58,7 +74,32 @@ window.AirSwapTrader.render(
   'body',
 )
 ```
-Now, you can see that the token and amount for the taker and maker has been set and locked.
+Now, you will see that the token and amount for the taker and maker has been set and locked. Click the button below to test it out!
+
+<button class="open-widget" id="open-trader-widget-2" onClick="(function() {
+  const button = document.getElementById('open-trader-widget-2');
+  button.disabled = true;
+  window.AirSwapTrader.render(
+    {
+      order: {
+        makerToken: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359', // DAI
+        makerParam: '10000000000000000000', // Atomic value for 10 DAI
+        takerToken: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
+        takerParam: '10000000000000000', // Atomic value for 0.01 WETH
+        expiry: 1707026510, // Expiration date in seconds
+      },
+      onCreate: (order, signature, cid) => {
+        console.log('Order Created!');
+      },
+      onClose: () => {
+        console.log('Widget Closed');
+        button.disabled = false;
+      },
+    },
+    'body',
+  )
+})()">Demo</button>
+
 ![Filled Trader View](../assets/widget/filled-build-order.png)
 
 #### Creating a Taker Flow
@@ -67,21 +108,21 @@ To initiate the Taker flow you would need to pass the full order and signature o
 window.AirSwapTrader.render(
   {
     order: {
-      makerToken: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
-      makerParam: '10000000000000000000',
+      makerToken: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359', // DAI
+      makerParam: '1000000000000000000', // Atomic value for 1 DAI
       makerWallet: '0xd68bb3350887ed3ee128b5ac4b7d852e24c5d366',
-      takerToken: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-      takerParam: '10000000000000000',
+      takerToken: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
+      takerParam: '10000000000000000000', // Atomic value for 10 WETH
       takerWallet: '0x0000000000000000000000000000000000000000', // Public Order
-      expiry: 1567026510,
-      nonce: 1566932032583
+      expiry: 1709574475,
+      nonce: 1567014475983
     },
     signature: {
       version: '0x01',
-      signer: '0x1ffb1788e56a755a74d3b63a787b09b65ca35e12',
-      r: '0xf49aca3b76c7ca2e0639410cc20e97f0fed8a5ac943841caab728bf5f0449d70',
-      s: '0x0ea08946287a9ab239e6ce0d90f004e3c211883183d92e2a40323a6c704c75e9',
-      v: 27,
+      signer: '0xd68bb3350887ed3ee128b5ac4b7d852e24c5d366',
+      r: '0xf28352ca1252b77771d55293f0fd49f97e544ccdf34c88a4821502495aa5dfa8',
+      s: '0x42e653d2a8b09adc6a547ae581a09162cb82d0e456d45fae662956b68de1a394',
+      v: 28,
     },
     onSwap: (transactionHash) => {
       console.log('Trade complete!')
@@ -98,7 +139,7 @@ If you have the full signed order details stored in [IPFS](https://ipfs.io), you
 ```js
 window.AirSwapTrader.render(
   {
-    cid: 'Qmf1WGjvWALQbGjou7D6Vs6EzwWTwDTePtFY8a8afedK9R',
+    cid: 'QmRi5hnoBJPKJ54FnyqyRnzsigpEYLq75pyjuNeMjoEsNf',
     onSwap: (transactionHash) => {
       console.log('Trade complete!')
     },
@@ -109,6 +150,23 @@ window.AirSwapTrader.render(
   'body',
 )
 ```
+<button class="open-widget" id="open-trader-widget-2" onClick="(function() {
+  const button = document.getElementById('open-trader-widget-2');
+  button.disabled = true;
+  window.AirSwapTrader.render(
+    {
+      cid: 'QmRi5hnoBJPKJ54FnyqyRnzsigpEYLq75pyjuNeMjoEsNf',
+      onSwap: (transactionHash) => {
+        console.log('Trade complete!')
+      },
+      onClose: () => {
+        console.log('Widget Closed');
+        button.disabled = false;
+      },
+    },
+    'body',
+  )
+})()">Demo</button>
 ![Taker View](../assets/widget/taker-view.png)
 
 ## Options {docsify-ignore}
@@ -131,7 +189,7 @@ order: {
 | ----------- | ----------- | ----------- |
 | string | `makerToken` | `optional` - The address of the token the party sends. Defaults to DAI. |
 | string | `makerParam` | `optional` - The atomic amount of an ERC-20 token or the ID of an ERC-721 token to send. |
-| string | `makerWallet` | `optional` - The address of the maker Ethereum account. This value is only used when you have a signed order for the user to take. Only used when providing a signed order. |
+| string | `makerWallet` | `optional` - The address of the maker Ethereum account. This value is only used when you have a signed order for the user to take. |
 | string | `takerToken` | `optional` - The address of the token the party receives. Defaults to ETH. |
 | string | `takerParam` | `optional` - The atomic amount of an ERC-20 token or the ID of an ERC-721 token to receive. |
 | string | `takerWallet` | `optional` - The address of the taker Ethereum account. If not provided, the order will be public for anyone to take. |
