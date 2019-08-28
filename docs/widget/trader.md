@@ -9,13 +9,11 @@ The AirSwap Trader Widget is an embeddable, HTML+JavaScript element that can be 
 Add this to your index.html or respective file to load the widget script.
 
 ```html
-<head>
-    <script src="https://cdn.airswap.io/airswap-trader.js"></script>
-</head>
+<script src="https://cdn.airswap.io/airswap-trader.js"></script>
 ```
 
 #### Creating an empty order builder
-Add the following code to where you want to open the widget. The `onCreate` callback function is triggered once the user successfully creates an order. The [order details](#order-ordertype-object-optional), [signature](#signature-signaturetype-object-optional) and [cid](#cid-string-optional) (ipfs hash) are passed as arguments.
+Embedding the widget is very simple. Simply add the following code to where you want to open the widget. The optional `onCreate` callback function will be triggered once the user successfully creates an order. The [order details](#order), [signature](#signature) and [cid](#cid) (ipfs hash) are passed as arguments.
 
 ```js
 window.AirSwapTrader.render(
@@ -51,15 +49,19 @@ Hurray! You will now see an empty order builder.
 ![Empty Trader View](../assets/widget/build-order.png)
 
 #### Pre-filling values in the order builder
-In many cases, you would want to set a desired token and amount. To do so, you can add an order object to the widget options. Passing a value in the object will lock the corresponding field in the widget, preventing the user from changing the value.
+In many cases, you would want to set a desired token and amount. To do so, you can add an [Order object](#order) to the widget options. Passing a value in the object will lock the corresponding field in the widget, preventing the user from changing the value.
 ```js
 window.AirSwapTrader.render(
   {
     order: {
-      makerToken: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359', // DAI
-      makerParam: '10000000000000000000', // Atomic value for 10 DAI
-      takerToken: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
-      takerParam: '10000000000000000', // Atomic value for 0.01 WETH
+      maker: {
+        token: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359', // DAI
+        param: '10000000000000000000', // Atomic value for 10 DAI
+      },
+      taker: {
+        token: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
+        param: '10000000000000000', // Atomic value for 0.01 WETH
+      },
       expiry: 1707026510, // Expiration date in seconds
     },
     onCreate: (order, signature, cid) => {
@@ -80,10 +82,14 @@ Now, you will see that the token and amount for the taker and maker has been set
   window.AirSwapTrader.render(
     {
       order: {
-        makerToken: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359', // DAI
-        makerParam: '10000000000000000000', // Atomic value for 10 DAI
-        takerToken: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
-        takerParam: '10000000000000000', // Atomic value for 0.01 WETH
+        maker: {
+          token: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359', // DAI
+          param: '10000000000000000000', // Atomic value for 10 DAI
+        },
+        taker: {
+          token: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
+          param: '10000000000000000', // Atomic value for 0.01 WETH
+        },
         expiry: 1707026510, // Expiration date in seconds
       },
       onCreate: (order, signature, cid) => {
@@ -106,14 +112,26 @@ To initiate the Taker flow you would need to pass the full order and signature o
 window.AirSwapTrader.render(
   {
     order: {
-      makerToken: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359', // DAI
-      makerParam: '1000000000000000000', // Atomic value for 1 DAI
-      makerWallet: '0xd68bb3350887ed3ee128b5ac4b7d852e24c5d366',
-      takerToken: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
-      takerParam: '10000000000000000000', // Atomic value for 10 WETH
-      takerWallet: '0x0000000000000000000000000000000000000000', // Public Order
-      expiry: 1709574475,
+      expiry: 1707026510,
       nonce: 1567014475983
+      maker: {
+        wallet: '0xd68bb3350887ed3ee128b5ac4b7d852e24c5d366',
+        token: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
+        param: '1000000000000000000',
+        kind: '0x277f8169'
+      },
+      taker: {
+        wallet: '0x0000000000000000000000000000000000000000',
+        token: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+        param: '10000000000000000',
+        kind: '0x277f8169'
+      },
+      taker: {
+        wallet: '0x0000000000000000000000000000000000000000',
+        token: '0x0000000000000000000000000000000000000000',
+        param: '0',
+        kind: '0x277f8169'
+      },
     },
     signature: {
       version: '0x01',
@@ -167,34 +185,44 @@ window.AirSwapTrader.render(
 })()">Demo</button>
 
 ## Options {docsify-ignore}
+| Key | Type | Description |
+| ----------- | ----------- | ----------- |
+| `order` | [Order](#order) | `optional` The Order details. Provide values to pre-populate the order builder. If any of these parameters are specified, it will lock the value in the widget. |
+| `signature` | [Signature](#signature) | `optional` The [ECDSA](https://hackernoon.com/a-closer-look-at-ethereum-signatures-5784c14abecc) signature of the order. |
+| `cid` | string | `optional` [IPFS](https://ipfs.io) hash for the order. If provided, the widget will fetch the order details from IPFS and display a take order screen. |
+| `onCreate` | Function | `optional` [Callback function](#onCreate) triggered on creation of a trade. |
+| `onSwap` | Function | `optional` [Callback function](#onSwap) triggered on a successful trade. |
+| `onCancel` | Function | `optional` [Callback function](#onCancel) triggered on a successful cancel. |
+| `onClose` | Function | **`required`** [Callback function](#onClose) triggered on widget close. |
 
-#### order `orderType (object)`, `optional`
+---
+#### Order
 Provide values to pre-populate the order builder. If any of these parameters are specified, it will lock the value in the widget. When setting a signed order, all values must be set.
 ```js
 order: {
-  makerToken: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
-  makerParam: '1000000000000000000',
-  makerWallet: '0xd68bb3350887ed3ee128b5ac4b7d852e24c5d366',
-  takerToken: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-  takerParam: '10000000000000000',
-  takerWallet: '0x0000000000000000000000000000000000000000',
   expiry: 1567024230,
-  nonce: 1566932032583
+  nonce: 1566932032583,
+  maker: {
+    ...
+  },
+  taker: {
+    ...
+  },
+  affiliate: {
+    ...
+  }
 }
 ```
 | Type | Key | Description |
 | ----------- | ----------- | ----------- |
-| string | `makerToken` | `optional` - The address of the token the party sends. Defaults to DAI. |
-| string | `makerParam` | `optional` - The atomic amount of an ERC-20 token or the ID of an ERC-721 token to send. |
-| string | `makerWallet` | `optional` - The address of the maker Ethereum account. This value is only used when you have a signed order for the user to take. |
-| string | `takerToken` | `optional` - The address of the token the party receives. Defaults to ETH. |
-| string | `takerParam` | `optional` - The atomic amount of an ERC-20 token or the ID of an ERC-721 token to receive. |
-| string | `takerWallet` | `optional` - The address of the taker Ethereum account. If not provided, the order will be public for anyone to take. |
-| int | `expiry` | `optional` - The expiry in **seconds** since unix epoch. |
-| string | `nonce` | `optional` - A numeric parameter of every Order that is unique to its Maker. Only used when providing a signed order. |
+| `nonce` | string | `optional` A numeric parameter of every Order that is unique to its Maker. Only used when providing a signed order. |
+| `expiry` | string | `optional` The expiry in **seconds** since unix epoch. |
+| `maker` | [Party](#party) | `optional` The Maker of the Order who sets price. |
+| `taker` | [Party](#party) | `optional` The Taker of the Order who accepts price. |
+| `affiliate` | [Party](#party) | `optional` Optional affiliate to be paid by the Maker. |
 
 ---
-#### signature `signatureType (object)`, `optional`
+#### Signature
 The [ECDSA](https://hackernoon.com/a-closer-look-at-ethereum-signatures-5784c14abecc) signature of the order.
 ```js
 signature: {
@@ -207,18 +235,36 @@ signature: {
 ```
 | Type | Key | Description |
 | ----------- | ----------- | ----------- |
-| string | `version` | `required` - The signing method used. |
-| string | `signer` | `required` - The address of the signer Ethereum account. |
-| string | `r` | `required` - The `r` value of an ECDSA signature. |
-| string | `s` | `required` - The `s` value of an ECDSA signature. |
-| number | `v` | `required` - The `v` value of an ECDSA signature. |
+| `version` | string | `required` - The signing method used. |
+| `signer` | string | `required` - The address of the signer Ethereum account. |
+| `r` | string | `required` - The `r` value of an ECDSA signature. |
+| `s` | string | `required` - The `s` value of an ECDSA signature. |
+| `v` | number | `required` - The `v` value of an ECDSA signature. |
 
 ---
-#### cid `string`, `optional`
+#### Party
+The details of a party.
+```js
+{
+  wallet: '0xd68bb3350887ed3ee128b5ac4b7d852e24c5d366',
+  token: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
+  param: '1000000000000000000',
+  kind: '0x277f8169'
+}
+```
+| Type | Key | Description |
+| ----------- | ----------- | ----------- |
+| string | `wallet` | `optional` The Ethereum account of the party |
+| string | `token` | `optional` The address of the token the party sends or receives |
+| string | `param` | `optional` The amount of ERC-20 or the identifier of an ERC-721 |
+| string | `kind` | `optional` The interface ID of the token. E.g. ERC-721 is 0x80ac58cd |
+
+---
+#### cid
 [IPFS](https://ipfs.io) hash for the order. If provided, the widget will fetch the order details from IPFS and display a take order screen.
 
 ---
-#### onCreate `Function`, `optional`
+#### onCreate
 Callback function triggered on creation of a trade. Passes the order, signature, and cid to the function as arguments.
 ```js
 function onCreate(order, signature, cid) {
@@ -228,12 +274,12 @@ function onCreate(order, signature, cid) {
 ```
 | Type | Parameter | Description |
 | ----------- | ----------- | ----------- |
-| object | `order` | The [order details](#order-ordertype-object-optional). |
-| object | `signature` | The [order signature](#signature-signaturetype-object-optional). |
-| string | `cid` | The [IPFS hash](#cid-string-optional) of the order. |
+| `order` | [Order](#order) | The order details. |
+| `signature` | [Signature](#signature) | The order signature. |
+| `cid` | string | The IPFS Hash of the order. |
 
 ---
-#### onSwap `Function`, `optional`
+#### onSwap
 Callback function triggered on a successful trade. Passes the transaction hash of the fill event as an argument.
 ```js
 function onSwap(transactionHash) {
@@ -246,7 +292,7 @@ function onSwap(transactionHash) {
 | `transactionHash` | `string` | Hash of the swap transaction. Can be used on blockchain explorers like [Etherscan](https://etherscan.io/) to view transaction details. |
 
 ---
-#### onCancel `Function`, `optional`
+#### onCancel
 Callback function triggered when a trade is canceled. Passes the transaction hash of the cancellation event as an argument.
 ```js
 function onCancel(transactionHash) {
@@ -259,7 +305,7 @@ function onCancel(transactionHash) {
 | `transactionHash` | `string` | Hash of the cancelation transaction. Can be used on blockchain explorers like [Etherscan](https://etherscan.io/) to view transaction details. |
 
 ---
-#### onClose `Function`, `required`
+#### onClose
 Callback function triggered when the user closes the widget. No arguments.
 
 ```js
