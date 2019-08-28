@@ -165,7 +165,6 @@ window.AirSwapTrader.render(
     'body',
   )
 })()">Demo</button>
-![Taker View](../assets/widget/taker-view.png)
 
 ## Options {docsify-ignore}
 
