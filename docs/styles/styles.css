@@ -231,3 +231,20 @@ body .sidebar-toggle span:nth-child(3) {
 .social-icon:hover {
   transform: scale(1.2);
 }
+
+/* Widget styles */
+.open-widget {
+  cursor: pointer;
+  background-color: #2B71FF;
+  font-size: 1em;
+  font-weight: 400;
+  padding: 10px 20px;
+  color: white;
+  outline: none;
+  border: none;
+  transition: 0.3s;
+}
+
+.open-widget:hover {
+  background-color: #2055bf;
+}
