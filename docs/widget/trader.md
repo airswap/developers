@@ -43,7 +43,7 @@ window.AirSwapTrader.render(
     },
     'body',
   )
-})()">Demo</button>
+})()">Try it out</button>
 
 Hurray! You will now see an empty order builder.
 ![Empty Trader View](../assets/widget/build-order.png)
@@ -76,6 +76,9 @@ window.AirSwapTrader.render(
 ```
 Now, you will see that the token and amount for the taker and maker has been set and locked. Click the button below to test it out!
 
+![Filled Trader View](../assets/widget/filled-build-order.png)
+
+
 <button class="open-widget" id="open-trader-widget-2" onClick="(function() {
   const button = document.getElementById('open-trader-widget-2');
   button.disabled = true;
@@ -102,9 +105,8 @@ Now, you will see that the token and amount for the taker and maker has been set
     },
     'body',
   )
-})()">Demo</button>
+})()">Try it out</button>
 
-![Filled Trader View](../assets/widget/filled-build-order.png)
 
 #### Creating a Taker Flow
 To initiate the Taker flow you would need to pass the full order and signature objects. The `onSwap` callback function will be triggered when the taker fills the order and passes the hash of the transaction as an argument.
@@ -176,7 +178,7 @@ window.AirSwapTrader.render(
     },
     'body',
   )
-})()">Demo</button>
+})()">Try it out</button>
 
 ## Options {docsify-ignore}
 | Key | Type | Description |
