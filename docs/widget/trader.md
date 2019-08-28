@@ -126,12 +126,6 @@ window.AirSwapTrader.render(
         param: '10000000000000000',
         kind: '0x277f8169'
       },
-      taker: {
-        wallet: '0x0000000000000000000000000000000000000000',
-        token: '0x0000000000000000000000000000000000000000',
-        param: '0',
-        kind: '0x277f8169'
-      },
     },
     signature: {
       version: '0x01',
@@ -208,9 +202,6 @@ order: {
   taker: {
     ...
   },
-  affiliate: {
-    ...
-  }
 }
 ```
 | Type | Key | Description |
@@ -219,7 +210,7 @@ order: {
 | `expiry` | string | `optional` The expiry in **seconds** since unix epoch. |
 | `maker` | [Party](#party) | `optional` The Maker of the Order who sets price. |
 | `taker` | [Party](#party) | `optional` The Taker of the Order who accepts price. |
-| `affiliate` | [Party](#party) | `optional` Optional affiliate to be paid by the Maker. |
+<!-- | `affiliate` | [Party](#party) | `optional` Optional affiliate to be paid by the Maker. | -->
 
 ---
 #### Signature
