@@ -6,7 +6,7 @@ The AirSwap Trader Widget is an embeddable, HTML+JavaScript element that can be 
 
 !> Pop-up blockers can prevent the AirSwap Trader Widget from loading properly.
 
-### Usage
+### Usage {docsify-ignore}
 #### Setup
 Add this to your index.html or respective file to load the widget script.
 
@@ -111,7 +111,7 @@ window.AirSwapTrader.render(
 ```
 ![Taker View](../assets/widget/taker-view.png)
 
-## Options
+## Options {docsify-ignore}
 
 #### order `orderType (object)`, `optional`
 Provide values to pre-populate the order builder. If any of these parameters are specified, it will lock the value in the widget. When setting a signed order, all values must be set.
@@ -129,18 +129,18 @@ order: {
 ```
 | Type | Key | Description |
 | ----------- | ----------- | ----------- |
-| string | `makerToken` | `optional` - Sets the maker token address. Defaults to DAI |
-| string | `makerParam` | `optional` - Sets the maker param. This can either be an atomic amount of ERC-20 tokens or ID of an ERC-721 token |
-| string | `makerWallet` | `optional` - Sets the maker wallet address. This value is only used when you have a signed order for the user to take. Only used when providing a signed order. |
-| string | `takerToken` | `optional` - Sets the taker token address. Defaults to ETH |
-| string | `takerParam` | `optional` - Sets the taker param. This can either be an atomic amount of ERC-20 tokens or ID of an ERC-721 token |
-| string | `takerWallet` | `optional` - Sets the taker wallet address. This value is only used when you have a signed order for the user to take. Only used when providing a signed order. |
-| int | `expiry` | `optional` - UTC timestamp of order expiry in **seconds**. |
-| string | `nonce` | `optional` - Nonce of the order. Only used when providing a signed order. |
+| string | `makerToken` | `optional` - The address of the token the party sends. Defaults to DAI. |
+| string | `makerParam` | `optional` - The atomic amount of an ERC-20 token or the ID of an ERC-721 token to send. |
+| string | `makerWallet` | `optional` - The address of the maker Ethereum account. This value is only used when you have a signed order for the user to take. Only used when providing a signed order. |
+| string | `takerToken` | `optional` - The address of the token the party receives. Defaults to ETH. |
+| string | `takerParam` | `optional` - The atomic amount of an ERC-20 token or the ID of an ERC-721 token to receive. |
+| string | `takerWallet` | `optional` - The address of the taker Ethereum account. If not provided, the order will be public for anyone to take. |
+| int | `expiry` | `optional` - The expiry in **seconds** since unix epoch. |
+| string | `nonce` | `optional` - A numeric parameter of every Order that is unique to its Maker. Only used when providing a signed order. |
 
-
+---
 #### signature `signatureType (object)`, `optional`
-The signature of the order.
+The [ECDSA](https://hackernoon.com/a-closer-look-at-ethereum-signatures-5784c14abecc) signature of the order.
 ```js
 signature: {
   version: '0x01',
@@ -152,17 +152,17 @@ signature: {
 ```
 | Type | Key | Description |
 | ----------- | ----------- | ----------- |
-| string | `version` | `required` - Sets the maker token address. Defaults to DAI |
-| string | `signer` | `required` - Sets the maker token address. Defaults to DAI |
-| string | `r` | `required` - Sets the maker token address. Defaults to DAI |
-| string | `s` | `required` - Sets the maker param. This can either be an amount of ERC-20 tokens or ID of ERC-721 tokens |
-| number | `v` | `required` - Sets the maker token address. Defaults to DAI |
+| string | `version` | `required` - The signing method used. |
+| string | `signer` | `required` - The address of the signer Ethereum account. |
+| string | `r` | `required` - The `r` value of an ECDSA signature. |
+| string | `s` | `required` - The `s` value of an ECDSA signature. |
+| number | `v` | `required` - The `v` value of an ECDSA signature. |
 
-
+---
 #### cid `string`, `optional`
 [IPFS](https://ipfs.io) hash for the order. If provided, the widget will fetch the order details from IPFS and display a take order screen.
 
-
+---
 #### onCreate `Function`, `optional`
 Callback function triggered on creation of a trade. Passes the order, signature, and cid to the function as arguments.
 ```js
@@ -173,11 +173,11 @@ function onCreate(order, signature, cid) {
 ```
 | Type | Parameter | Description |
 | ----------- | ----------- | ----------- |
-| object | `order` | The [order details](#order-ordertype-object-optional) |
-| object | `signature` | The [order signature](#signature-signaturetype-object-optional) |
-| string | `cid` | The [IPFS hash](#cid-string-optional) of the order |
+| object | `order` | The [order details](#order-ordertype-object-optional). |
+| object | `signature` | The [order signature](#signature-signaturetype-object-optional). |
+| string | `cid` | The [IPFS hash](#cid-string-optional) of the order. |
 
-
+---
 #### onSwap `Function`, `optional`
 Callback function triggered on a successful trade. Passes the transaction hash of the fill event as an argument.
 ```js
@@ -188,9 +188,9 @@ function onSwap(transactionHash) {
 ```
 | Type | Parameter | Description |
 | ----------- | ----------- | ----------- |
-| `transactionHash` | `string` | Order details |
+| `transactionHash` | `string` | Hash of the swap transaction. Can be used on blockchain explorers like [Etherscan](https://etherscan.io/) to view transaction details. |
 
-
+---
 #### onCancel `Function`, `optional`
 Callback function triggered when a trade is canceled. Passes the transaction hash of the cancellation event as an argument.
 ```js
@@ -201,9 +201,9 @@ function onCancel(transactionHash) {
 ```
 | Type | Parameter | Description |
 | ----------- | ----------- | ----------- |
-| `transactionHash` | `string` | Order details |
+| `transactionHash` | `string` | Hash of the cancelation transaction. Can be used on blockchain explorers like [Etherscan](https://etherscan.io/) to view transaction details. |
 
-
+---
 #### onClose `Function`, `required`
 Callback function triggered when the user closes the widget. No arguments.
 
