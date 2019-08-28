@@ -33,7 +33,7 @@ window.AirSwapTrader.render(
 )
 ```
 
-Hurray! You will now see an empty trade builder.
+Hurray! You will now see an empty order builder.
 ![Empty Trader View](../assets/widget/build-order.png)
 
 #### Pre-filling values in the order builder
@@ -42,11 +42,11 @@ In many cases, you would want to set a desired token and amount. To do so, you c
 window.AirSwapTrader.render(
   {
     order: {
-      makerToken: '0xce787654722aed819d7a8073576d2b2b359641b5',
-      makerParam: '10000000000000000000',
-      takerToken: '0xc778417e063141139fce010982780140aa0cd5ab',
-      takerParam: '10000000000000000',
-      expiry: 1567026510,
+      makerToken: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359', // DAI
+      makerParam: '10000000000000000000', // Atomic value for 10 DAI
+      takerToken: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
+      takerParam: '10000000000000000', // Atomic value for 0.01 WETH
+      expiry: 1567026510, // Expiration date in seconds - Note: This is 24 hours past from the time of writing
     },
     onCreate: (order, signature, cid) => {
       console.log('Order created!')
@@ -67,12 +67,12 @@ To initiate the Taker flow you would need to pass the full order and signature o
 window.AirSwapTrader.render(
   {
     order: {
-      makerToken: '0xce787654722aed819d7a8073576d2b2b359641b5',
+      makerToken: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
       makerParam: '10000000000000000000',
       makerWallet: '0xd68bb3350887ed3ee128b5ac4b7d852e24c5d366',
-      takerToken: '0xc778417e063141139fce010982780140aa0cd5ab',
+      takerToken: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
       takerParam: '10000000000000000',
-      takerWallet: '0x0000000000000000000000000000000000000000',
+      takerWallet: '0x0000000000000000000000000000000000000000', // Public Order
       expiry: 1567026510,
       nonce: 1566932032583
     },
@@ -114,13 +114,13 @@ window.AirSwapTrader.render(
 ## Options
 
 #### order `orderType (object)`, `optional`
-Provide values to pre-populate the trade builder. If any of these parameters are specified, it will lock the value in the widget. When setting a signed order, all values must be set.
+Provide values to pre-populate the order builder. If any of these parameters are specified, it will lock the value in the widget. When setting a signed order, all values must be set.
 ```js
 order: {
-  makerToken: '0xce787654722aed819d7a8073576d2b2b359641b5',
+  makerToken: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
   makerParam: '1000000000000000000',
   makerWallet: '0xd68bb3350887ed3ee128b5ac4b7d852e24c5d366',
-  takerToken: '0xc778417e063141139fce010982780140aa0cd5ab',
+  takerToken: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   takerParam: '10000000000000000',
   takerWallet: '0x0000000000000000000000000000000000000000',
   expiry: 1567024230,
