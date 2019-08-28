@@ -212,7 +212,6 @@ order: {
 | `expiry` | string | `optional` The expiry in **seconds** since unix epoch. |
 | `maker` | [Party](#party) | `optional` The Maker of the Order who sets price. |
 | `taker` | [Party](#party) | `optional` The Taker of the Order who accepts price. |
-<!-- | `affiliate` | [Party](#party) | `optional` Optional affiliate to be paid by the Maker. | -->
 
 ---
 #### Signature
@@ -247,10 +246,10 @@ The details of a party.
 ```
 | Type | Key | Description |
 | ----------- | ----------- | ----------- |
-| string | `wallet` | `optional` The Ethereum account of the party |
-| string | `token` | `optional` The address of the token the party sends or receives |
-| string | `param` | `optional` The amount of ERC-20 or the identifier of an ERC-721 |
-| string | `kind` | `optional` The interface ID of the token. E.g. ERC-721 is 0x80ac58cd |
+| `wallet` | string | | `optional` The Ethereum account of the party |
+| `token` | string | `optional` The address of the token the party sends or receives |
+| `param` | string | `optional` The amount of ERC-20 or the identifier of an ERC-721 |
+| `kind` | string | `optional` The interface ID of the token. E.g. ERC-721 is 0x80ac58cd |
 
 ---
 #### cid
