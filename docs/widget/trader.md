@@ -208,13 +208,13 @@ order: {
   }
 }
 ```
-| Key | Type | Description |
-| ----------- | ----------- | ----------- |
-| `nonce` | string | `optional` A numeric parameter of every Order that is unique to its Maker. Only used when providing a signed order. |
-| `expiry` | string | `optional` The expiry in **seconds** since unix epoch. |
-| `maker` | [Party](#party) | `optional` The Maker of the Order who sets price. |
-| `taker` | [Party](#party) | `optional` The Taker of the Order who accepts price. |
-| `signature` | [Signature](#signature) | `optional` The signature of the order. |
+| Type | Key | Field | Description |
+| ----------- | ----------- | ----------- | ----------- |
+| `nonce` | string | `optional` | A numeric parameter of every Order that is unique to its Maker. Only used when providing a signed order. |
+| `expiry` | string | `optional` | The expiry in **seconds** since unix epoch. |
+| `maker` | [Party](#party) | `optional` | The Maker of the Order who sets price. |
+| `taker` | [Party](#party) | `optional` | The Taker of the Order who accepts price. |
+| `signature` | [Signature](#signature) | `optional` | The signature of the order. |
 
 ---
 #### Party
