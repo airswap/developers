@@ -231,3 +231,26 @@ body .sidebar-toggle span:nth-child(3) {
 .social-icon:hover {
   transform: scale(1.2);
 }
+
+/* Widget styles */
+.open-widget {
+  font-weight: 500;
+  background: #2b71ff;
+  border-radius: 40px;
+  border: 0;
+  color: #fff;
+  padding: 8px 18px;
+  font-size: 14px;
+  letter-spacing: .01em;
+  margin-right: 15px;
+  white-space: nowrap;
+  box-shadow: 0 10px 20px -10px rgba(43,113,255,.7);
+  -webkit-transition: all .4s ease-in-out;
+  transition: all .4s ease-in-out;
+}
+
+.open-widget:hover {
+  box-shadow: 0 5px 10px rgba(0,0,0,.05);
+  transform: scale(0.95);
+  cursor: pointer;
+}

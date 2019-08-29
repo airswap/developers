@@ -54,7 +54,7 @@ class AirSwap {
         : new Contract('0x9d7efd45e45c575cafb25d49d43556f43ebe3456', pgpABI, this.wallet)
     // Set the websocket url based on environment
     this.socketUrl =
-      networkId === 'mainnet' ? 'wss://connect.airswap-api.com/websocket' : 'wss://sandbox.airswap-api.com/websocket'
+      networkId === 'mainnet' ? 'wss://connect.airswap.io/websocket' : 'wss://connect.development.airswap.io/websocket'
 
     // Websocket authentication state
     this.isAuthenticated = false

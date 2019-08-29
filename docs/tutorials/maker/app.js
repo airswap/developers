@@ -176,6 +176,20 @@ async function main() {
   // https://instant.development.airswap.io
   await router
     .setIntents([
+    // Connect and authenticate with the AirSwap Websocket
+    await router.connect().catch(e => {
+      console.log('unable to connect to Websocket', e)
+    })
+
+    // Fetch token metadata
+    await TokenMetadata.ready
+    const { ETH, AST } = TokenMetadata.tokenAddressesBySymbol
+    // Set an intent to trade AST/ETH
+    // Your wallet must have 250 AST to complete this step.
+    // If you have Rinkeby ETH, you can buy Rinkeby AST at:
+    // https://instant.development.airswap.io
+    await router.setIntents([
+>>>>>>> develop
       {
         makerToken: AST,
         takerToken: ETH,
