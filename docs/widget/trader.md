@@ -4,8 +4,8 @@ The AirSwap Trader Widget is an embeddable, HTML+JavaScript element that can be 
 
 !> Pop-up blockers can prevent the AirSwap Trader Widget from loading properly.
 
-### Usage {docsify-ignore}
-#### Setup
+## Usage {docsify-ignore}
+### Setup
 Add this to your index.html or respective file to load the widget script.
 
 ```html
@@ -180,16 +180,16 @@ window.AirSwapTrader.render(
   )
 })()">Try it out</button>
 
-## Options {docsify-ignore}
-| Key | Type | Description |
-| ----------- | ----------- | ----------- |
-| `order` | [Order](#order) | `optional` The Order details. Provide values to pre-populate the order builder. If any of these parameters are specified, it will lock the value in the widget. |
-| `signature` | [Signature](#signature) | `optional` The [ECDSA](https://hackernoon.com/a-closer-look-at-ethereum-signatures-5784c14abecc) signature of the order. |
-| `cid` | string | `optional` [IPFS](https://ipfs.io) hash for the order. If provided, the widget will fetch the order details from IPFS and display a take order screen. |
-| `onCreate` | Function | `optional` [Callback function](#onCreate) triggered on creation of a trade. |
-| `onSwap` | Function | `optional` [Callback function](#onSwap) triggered on a successful trade. |
-| `onCancel` | Function | `optional` [Callback function](#onCancel) triggered on a successful cancel. |
-| `onClose` | Function | **`required`** [Callback function](#onClose) triggered on widget close. |
+## Options
+| Key | Type | Field | Description |
+| ----------- | ----------- |  ----------- | ----------- |
+| `order` | [Order](#order) | `optional` |  The Order details. Provide values to pre-populate the order builder. If any of these parameters are specified, it will lock the value in the widget. |
+| `signature` | [Signature](#signature) | `optional` |  The [ECDSA](https://hackernoon.com/a-closer-look-at-ethereum-signatures-5784c14abecc) signature of the order. |
+| `cid` | string | `optional` | [IPFS](https://ipfs.io) hash for the order. If provided, the widget will fetch the order details from IPFS and display a take order screen. |
+| `onCreate` | Function | `optional`  | [Callback function](#onCreate) triggered on creation of a trade. |
+| `onSwap` | Function | `optional`  | [Callback function](#onSwap) triggered on a successful trade. |
+| `onCancel` | Function | `optional`  | [Callback function](#onCancel) triggered on a successful cancel. |
+| `onClose` | Function | **`required`** |  [Callback function](#onClose) triggered on widget close. |
 
 ---
 #### Order
@@ -206,12 +206,12 @@ order: {
   },
 }
 ```
-| Type | Key | Description |
-| ----------- | ----------- | ----------- |
-| `nonce` | string | `optional` A numeric parameter of every Order that is unique to its Maker. Only used when providing a signed order. |
-| `expiry` | string | `optional` The expiry in **seconds** since unix epoch. |
-| `maker` | [Party](#party) | `optional` The Maker of the Order who sets price. |
-| `taker` | [Party](#party) | `optional` The Taker of the Order who accepts price. |
+| Type | Key | Field | Description |
+| ----------- | ----------- | ----------- | ----------- |
+| `nonce` | string | `optional`  |  A numeric parameter of every Order that is unique to its Maker. Only used when providing a signed order. |
+| `expiry` | string | `optional`  | The expiry in **seconds** since unix epoch. |
+| `maker` | [Party](#party) | `optional` |  The Maker of the Order who sets price. |
+| `taker` | [Party](#party) | `optional` |  The Taker of the Order who accepts price. |
 
 ---
 #### Signature
@@ -225,13 +225,13 @@ signature: {
   v: 28,
 }
 ```
-| Type | Key | Description |
-| ----------- | ----------- | ----------- |
-| `version` | string | `required` - The signing method used. |
-| `signer` | string | `required` - The address of the signer Ethereum account. |
-| `r` | string | `required` - The `r` value of an ECDSA signature. |
-| `s` | string | `required` - The `s` value of an ECDSA signature. |
-| `v` | number | `required` - The `v` value of an ECDSA signature. |
+| Type | Key | Field | Description |
+| ----------- | ----------- | ----------- | ----------- |
+| `version` | string | `required` |  The signing method used. |
+| `signer` | string | `required` | The address of the signer Ethereum account. |
+| `r` | string | `required` |  The `r` value of an ECDSA signature. |
+| `s` | string | `required` |  The `s` value of an ECDSA signature. |
+| `v` | number | `required` |  The `v` value of an ECDSA signature. |
 
 ---
 #### Party
@@ -244,12 +244,12 @@ The details of a party.
   kind: '0x277f8169'
 }
 ```
-| Type | Key | Description |
-| ----------- | ----------- | ----------- |
-| `wallet` | string | | `optional` The Ethereum account of the party |
-| `token` | string | `optional` The address of the token the party sends or receives |
-| `param` | string | `optional` The amount of ERC-20 or the identifier of an ERC-721 |
-| `kind` | string | `optional` The interface ID of the token. E.g. ERC-721 is 0x80ac58cd |
+| Type | Key | Field | Description |
+| ----------- | ----------- | ----------- | ----------- |
+| `wallet` | string | `optional` | The Ethereum account of the party |
+| `token` | string | `optional` | The address of the token the party sends or receives |
+| `param` | string | `optional` | The amount of ERC-20 or the identifier of an ERC-721 |
+| `kind` | string | `optional` | The interface ID of the token. E.g. ERC-721 is 0x80ac58cd |
 
 ---
 #### cid
