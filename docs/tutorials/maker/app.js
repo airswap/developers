@@ -4,13 +4,15 @@ const TokenMetadata = require('AirSwap.js/src/tokens')
 const DeltaBalances = require('AirSwap.js/src/deltaBalances')
 
 const PK = process.env.PRIVATE_KEY
+const ENV = process.env.ENV
+if (!ENV) {
+  console.log(`Please set ENV='development' to run against rinkeby, by default it runs against mainnet`)
+}
+
 if (!PK) {
   console.log('Please set the PRIVATE_KEY environment variable')
   process.exit(0)
 }
-
-const AST = '0xcc1cbd4f67cceb7c001bd4adf98451237a193ff8' // Rinkeby AST address
-const ETH = '0x0000000000000000000000000000000000000000'
 
 const wallet = new ethers.Wallet(PK)
 const address = wallet.address.toLowerCase()
@@ -18,8 +20,10 @@ const messageSigner = data => wallet.signMessage(data)
 const routerParams = {
   messageSigner,
   address,
-  keyspace: false
+  keyspace: false,
+  requireAuthentication: true,
 }
+
 const router = new Router(routerParams)
 
 function priceTrade(params) {
@@ -33,26 +37,31 @@ function priceTrade(params) {
   if (params.makerAmount) {
     // Maker amount specified, calculate the amount taker must send
     makerAmount = params.makerAmount
-    const makerAmountDecimals = TokenMetadata.formatDisplayValueByToken({address: params.makerToken}, params.makerAmount)
+    const makerAmountDecimals = TokenMetadata.formatDisplayValueByToken(
+      { address: params.makerToken },
+      params.makerAmount,
+    )
     const takerAmountDecimals = makerAmountDecimals * price
-    takerAmount = TokenMetadata.formatAtomicValueByToken({address: params.takerToken}, takerAmountDecimals)
+    takerAmount = TokenMetadata.formatAtomicValueByToken({ address: params.takerToken }, takerAmountDecimals)
   } else if (params.takerAmount) {
     // Taker amount specified, calculate the amount maker must send
     takerAmount = params.takerAmount
-    const takerAmountDecimals = TokenMetadata.formatDisplayValueByToken({address: params.takerToken}, params.takerAmount)
+    const takerAmountDecimals = TokenMetadata.formatDisplayValueByToken(
+      { address: params.takerToken },
+      params.takerAmount,
+    )
     const makerAmountDecimals = takerAmountDecimals / price
-    makerAmount = TokenMetadata.formatAtomicValueByToken({address: params.makerToken}, makerAmountDecimals)
+    makerAmount = TokenMetadata.formatAtomicValueByToken({ address: params.makerToken }, makerAmountDecimals)
   }
 
   return {
     makerAmount,
-    takerAmount
+    takerAmount,
   }
 }
 
 async function getOrder(payload) {
   const { params } = payload.message
-
   // Price the order
   const { makerAmount, takerAmount } = priceTrade(params)
 
@@ -64,8 +73,10 @@ async function getOrder(payload) {
     takerToken: params.takerToken,
     takerAddress: params.takerAddress,
     makerAddress: address,
-    nonce: Number(Math.random() * 100000).toFixed().toString(),
-    expiration: Math.round(new Date().getTime()/ 1000) + 300 // Expire after 5 minutes
+    nonce: Number(Math.random() * 100000)
+      .toFixed()
+      .toString(),
+    expiration: Math.round(new Date().getTime() / 1000) + 300, // Expire after 5 minutes
   }
 
   // Sign the order
@@ -75,7 +86,7 @@ async function getOrder(payload) {
   response = {
     id: payload.message.id,
     jsonrpc: '2.0',
-    result: signedOrder
+    result: signedOrder,
   }
 
   // Send the order
@@ -102,12 +113,12 @@ async function getQuote(payload) {
   response = {
     id: payload.message.id,
     jsonrpc: '2.0',
-    result: quote
+    result: quote,
   }
 
   // Send the quote
   router.call(payload.sender, response)
-  console.log('sent quote', response)
+  // console.log('sent quote', response)
 }
 
 async function getMaxQuote(payload) {
@@ -135,54 +146,66 @@ async function getMaxQuote(payload) {
   const quote = {
     ...params,
     makerAmount,
-    takerAmount
+    takerAmount,
   }
 
   // Construct a JSON RPC response
   response = {
     id: payload.message.id,
     jsonrpc: '2.0',
-    result: quote
+    result: quote,
   }
 
   // Send the max quote
   router.call(payload.sender, response)
-  console.log('sent max quote', response)
+  // console.log('sent max quote', response)
 }
 
 async function main() {
-    // Connect and authenticate with the AirSwap Websocket
-    await router.connect().catch(e => {
-      console.log('unable to connect to Websocket', e)
-    })
+  // 1. Connect and authenticate with the AirSwap Websocket
+  await router.connect().catch(e => {
+    console.log('unable to connect to Websocket', e)
+  })
 
-    // Fetch token metadata
-    await TokenMetadata.ready
-
-    // Set an intent to trade AST/ETH
-    // Your wallet must have 250 AST to complete this step.
-    // If you have Rinkeby ETH, you can buy Rinkeby AST at:
-    // https://sandbox.airswap.io
-    await router.setIntents([
+  // Fetch token metadata
+  await TokenMetadata.ready
+  const { ETH, AST } = TokenMetadata.tokenAddressesBySymbol
+  // 2. Set an intent to trade AST/ETH
+  // Your wallet must have 250 AST to complete this step.
+  // If you have Rinkeby ETH, you can buy Rinkeby AST at:
+  // https://instant.development.airswap.io
+  await router
+    .setIntents([
       {
         makerToken: AST,
         takerToken: ETH,
         role: 'maker',
-        supportedMethods: ["getOrder", "getQuote", "getMaxQuote"]
-      }
-    ]).then(() => {
+        supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+      },
+    ])
+    .then(() => {
       console.log('setIntents for AST/ETH')
-    }).catch(e => {
+    })
+    .catch(e => {
       console.log('unable to setIntents', e)
     })
 
-    // Set handlers for quotes
-    router.RPC_METHOD_ACTIONS['getOrder'] = getOrder
-    router.RPC_METHOD_ACTIONS['getQuote'] = getQuote
-    router.RPC_METHOD_ACTIONS['getMaxQuote'] = getMaxQuote
+  // Set handlers for quotes
+  router.RPC_METHOD_ACTIONS['getOrder'] = getOrder
+  router.RPC_METHOD_ACTIONS['getQuote'] = getQuote
+  router.RPC_METHOD_ACTIONS['getMaxQuote'] = getMaxQuote
 }
 
-async function signOrder({ makerAddress, makerAmount, makerToken, takerAddress, takerAmount, takerToken, expiration, nonce }) {
+async function signOrder({
+  makerAddress,
+  makerAmount,
+  makerToken,
+  takerAddress,
+  takerAmount,
+  takerToken,
+  expiration,
+  nonce,
+}) {
   const types = [
     'address', // makerAddress
     'uint256', // makerAmount
@@ -209,7 +232,7 @@ async function signOrder({ makerAddress, makerAmount, makerToken, takerAddress, 
 
   return {
     ...order,
-    ...sig
+    ...sig,
   }
 }
 
