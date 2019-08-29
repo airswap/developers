@@ -38,7 +38,7 @@ AirSwapInstant.render(
 <button class="open-widget" id="open-instant-widget-1" onClick="(function() {
   const button = document.getElementById('open-instant-widget-1');
   button.disabled = true;
-  AirSwapInstant.render(
+  window.AirSwapInstant.render(
     {
       env: 'production',
       mode: 'buy',
@@ -46,6 +46,7 @@ AirSwapInstant.render(
       amount: '250',
       onClose: function() {
         console.info('Trade was canceled.')
+        button.disabled = false;
       },
       onComplete: function(transactionId) {
         console.info('Trade complete.', transactionId)
@@ -73,10 +74,11 @@ AirSwapInstant.render(
 <button class="open-widget" id="open-instant-widget-2" onClick="(function() {
   const button = document.getElementById('open-instant-widget-2');
   button.disabled = true;
-  AirSwapInstant.render(
+  window.AirSwapInstant.render(
     {
       onClose: function() {
         console.info('Trade was canceled.')
+        button.disabled = false;
       },
     },
     'body',
