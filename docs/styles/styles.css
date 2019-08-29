@@ -234,17 +234,23 @@ body .sidebar-toggle span:nth-child(3) {
 
 /* Widget styles */
 .open-widget {
-  cursor: pointer;
-  background-color: #2B71FF;
-  font-size: 1em;
-  font-weight: 400;
-  padding: 10px 20px;
-  color: white;
-  outline: none;
-  border: none;
-  transition: 0.3s;
+  font-weight: 500;
+  background: #2b71ff;
+  border-radius: 40px;
+  border: 0;
+  color: #fff;
+  padding: 8px 18px;
+  font-size: 14px;
+  letter-spacing: .01em;
+  margin-right: 15px;
+  white-space: nowrap;
+  box-shadow: 0 10px 20px -10px rgba(43,113,255,.7);
+  -webkit-transition: all .4s ease-in-out;
+  transition: all .4s ease-in-out;
 }
 
 .open-widget:hover {
-  background-color: #2055bf;
+  box-shadow: 0 5px 10px rgba(0,0,0,.05);
+  transform: scale(0.95);
+  cursor: pointer;
 }
