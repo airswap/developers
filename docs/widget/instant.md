@@ -46,6 +46,7 @@ AirSwapInstant.render(
       amount: '250',
       onClose: function() {
         console.info('Trade was canceled.')
+        button.disabled = false;
       },
       onComplete: function(transactionId) {
         console.info('Trade complete.', transactionId)
@@ -77,6 +78,7 @@ AirSwapInstant.render(
     {
       onClose: function() {
         console.info('Trade was canceled.')
+        button.disabled = false;
       },
     },
     'body',
