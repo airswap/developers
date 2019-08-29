@@ -239,6 +239,7 @@ body .sidebar-toggle span:nth-child(3) {
   border-radius: 40px;
   border: 0;
   color: #fff;
+  outline: none;
   padding: 8px 18px;
   font-size: 14px;
   letter-spacing: .01em;
