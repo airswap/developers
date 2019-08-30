@@ -1,11 +1,13 @@
 ![AirSwap Developers](./assets/logo/AirSwap-Developers-Title.png)
 
+!> Participating in the GitCoin virtual hackathon? Make sure to check out the [Gitbook](https://airswap.gitbook.io/airswap/) too!
+
 ## What is AirSwap? {docsify-ignore-all}
 
 [AirSwap](https://airswap.io/) is a peer-to-peer network for trading Ethereum ERC20 tokens. Peers connect to the network and use the [Swap](https://swap.tech/whitepaper/) protocol to find and execute trades:
 
-* Makers: provide liquidity
-* Takers: take liquidity
+- Makers: provide liquidity
+- Takers: take liquidity
 
 In general, Takers tend to use existing [dApps](dapps/widget.md) for price discovery and execution, while Makers tend to use our APIs and libraries to provide quotes and signed orders.
 
@@ -13,4 +15,4 @@ In general, Takers tend to use existing [dApps](dapps/widget.md) for price disco
 
 ## Join the Conversation
 
-Be sure to join the AirSwap Developers Telegram group at https://t.me/airswapdevs or the AirSwap Community at https://t.me/airswap.
+Be sure to join the AirSwap Developers Telegram group at https://t.me/airswapdevs and the Discord at https://chat.airswap.io
