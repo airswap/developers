@@ -4,24 +4,26 @@
 
 In [Concepts](../getting-started/concepts.md), we learned about Makers and Takers and how they interact with one another using dApps and APIs. We looked at the [Indexer](../api/indexer.md) and learned about Intents. In this tutorial, you'll learn how to put together these concepts in order to provide liquidity on the AirSwap network. Over the course of this tutorial, you'll learn how to:
 
-* Authenticate with the AirSwap Websocket
-* Create Intents
-* Receive order and quote requests
-* Craft, sign and send orders
+- Authenticate with the AirSwap Websocket
+- Create Intents
+- Receive order and quote requests
+- Craft, sign and send orders
 
 [View the code on GitHub](https://github.com/airswap/developers/blob/master/docs/tutorials/maker/app.js)
 
 ## Requirements
 
-* NodeJS 8 or higher.
-* Yarn (`npm install yarn`).
-* An Ethereum key pair. You can use Metamask to create a new wallet and export the private key.
-* Rinkeby ETH.
-* At least 250 Rinkeby AST.
+- NodeJS 8 or higher.
+- Yarn (`npm install yarn`).
+- An Ethereum key pair. You can use Metamask to create a new wallet and export the private key.
+- Rinkeby ETH.
+- At least 250 Rinkeby AST.
 
 ## Getting Started
 
-First, use the [Faucet](https://faucet.rinkeby.io/) to obtain Rinkeby ETH. Then, go to the [AirSwap Development Frontend](https://instant.development.airswap.io) and obtain at least 250 Rinkeby AST.
+First, use the [ETH Faucet](https://faucet.rinkeby.io/) to obtain Rinkeby ETH.
+
+Then, go to the [AST Faucet](https://ast-faucet-ui.development.airswap.io/) and obtain AST. The faucet will grant you 5000, and you only need 250 per intent.
 
 Use ENV to control which environment to connect to. We'll use `development` for Rinkeby. You can `production` for Mainnet when you're ready to go live.
 
@@ -69,10 +71,10 @@ Next, create an asynchronous main() function to connect.
 
 ```javascript
 async function main() {
-    // Connect and authenticate with the AirSwap Websocket
-    await router.connect().catch(e => {
-      console.log('unable to connect to Websocket', e)
-    })
+  // Connect and authenticate with the AirSwap Websocket
+  await router.connect().catch(e => {
+    console.log('unable to connect to Websocket', e)
+  })
 }
 ```
 
@@ -87,18 +89,21 @@ Use `router.setIntents()` to create intents. This action is idempotent and repla
 ```javascript
 await tokenMetadata.ready
 const { ETH, AST } = tokenMetadata.tokenAddressesBySymbol
-await router.setIntents([
-  {
-    makerToken: AST,
-    takerToken: ETH,
-    role: 'maker',
-    supportedMethods: ["getOrder", "getQuote", "getMaxQuote"]
-  }
-]).then(() => {
-  console.log('setIntents for AST/ETH')
-}).catch(e => {
-  console.log('unable to setIntents', e)
-})
+await router
+  .setIntents([
+    {
+      makerToken: AST,
+      takerToken: ETH,
+      role: 'maker',
+      supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+    },
+  ])
+  .then(() => {
+    console.log('setIntents for AST/ETH')
+  })
+  .catch(e => {
+    console.log('unable to setIntents', e)
+  })
 ```
 
 ## Handle Requests
@@ -147,20 +152,26 @@ function priceTrade(params) {
   if (params.makerAmount) {
     // Maker amount specified, calculate the amount taker must send
     makerAmount = params.makerAmount
-    const makerAmountDecimals = TokenMetadata.formatDisplayValueByToken({address: params.makerToken}, params.makerAmount)
+    const makerAmountDecimals = TokenMetadata.formatDisplayValueByToken(
+      { address: params.makerToken },
+      params.makerAmount,
+    )
     const takerAmountDecimals = makerAmountDecimals * price
-    takerAmount = TokenMetadata.formatAtomicValueByToken({address: params.takerToken}, takerAmountDecimals)
+    takerAmount = TokenMetadata.formatAtomicValueByToken({ address: params.takerToken }, takerAmountDecimals)
   } else if (params.takerAmount) {
     // Taker amount specified, calculate the amount maker must send
     takerAmount = params.takerAmount
-    const takerAmountDecimals = TokenMetadata.formatDisplayValueByToken({address: params.takerToken}, params.takerAmount)
+    const takerAmountDecimals = TokenMetadata.formatDisplayValueByToken(
+      { address: params.takerToken },
+      params.takerAmount,
+    )
     const makerAmountDecimals = takerAmountDecimals / price
-    makerAmount = TokenMetadata.formatAtomicValueByToken({address: params.makerToken}, makerAmountDecimals)
+    makerAmount = TokenMetadata.formatAtomicValueByToken({ address: params.makerToken }, makerAmountDecimals)
   }
 
   return {
     makerAmount,
-    takerAmount
+    takerAmount,
   }
 }
 ```
@@ -175,8 +186,10 @@ order = {
   takerToken: params.takerToken,
   takerAddress: params.takerAddress,
   makerAddress: address,
-  nonce: Number(Math.random() * 100000).toFixed().toString(),
-  expiration: Math.round(new Date().getTime()/ 1000) + 300 // Expire after 5 minutes
+  nonce: Number(Math.random() * 100000)
+    .toFixed()
+    .toString(),
+  expiration: Math.round(new Date().getTime() / 1000) + 300, // Expire after 5 minutes
 }
 ```
 
@@ -185,7 +198,16 @@ order = {
 Finally, we are ready to sign the order. We'll create a function that uses the `ethers` library to hash and sign the order.
 
 ```javascript
-async function signOrder({ makerAddress, makerAmount, makerToken, takerAddress, takerAmount, takerToken, expiration, nonce }) {
+async function signOrder({
+  makerAddress,
+  makerAmount,
+  makerToken,
+  takerAddress,
+  takerAmount,
+  takerToken,
+  expiration,
+  nonce,
+}) {
   const types = [
     'address', // makerAddress
     'uint256', // makerAmount
@@ -214,7 +236,7 @@ async function signOrder({ makerAddress, makerAmount, makerToken, takerAddress, 
 
   return {
     ...order,
-    ...sig
+    ...sig,
   }
 }
 ```
@@ -231,7 +253,7 @@ const signedOrder = await signOrder(order)
 response = {
   id: payload.message.id,
   jsonrpc: '2.0',
-  result: signedOrder
+  result: signedOrder,
 }
 
 // Send the order
