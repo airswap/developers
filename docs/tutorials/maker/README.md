@@ -23,7 +23,7 @@ In [Concepts](../getting-started/concepts.md), we learned about Makers and Taker
 
 First, use the [ETH Faucet](https://faucet.rinkeby.io/) to obtain Rinkeby ETH.
 
-Then, go to the [AST Faucet](https://ast-faucet-ui.development.airswap.io/) and obtain AST. The faucet will grant you 5000, and you only need 250 per intent.
+Then, go to the [AST Faucet](https://ast-faucet-ui.development.airswap.io/) to obtain Rinkeby AST. The faucet will grant you 5000, and you only need 250 per intent.
 
 Use ENV to control which environment to connect to. We'll use `development` for Rinkeby. You can `production` for Mainnet when you're ready to go live.
 
