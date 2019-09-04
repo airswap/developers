@@ -1,29 +1,55 @@
-const AirSwap = require('./lib/AirSwap.js')
 const express = require('express')
 const rp = require('request-promise')
+const ethers = require('ethers')
+const Router = require('airswap.js/src/protocolMessaging')
+const Swap = require('airswap.js/src/swap')
+const { nest } = require('airswap.js/src/swap/utils')
 
-if (!process.env.PRIVATE_KEY || !process.env.MAINNET) {
+const { PRIVATE_KEY, ENV } = process.env
+
+if (!ENV) {
+  console.log(`Please set ENV='development' to run on the rinkeby test network, by default it runs against mainnet`)
+}
+
+if (!PRIVATE_KEY) {
   throw new Error('must set PRIVATE_KEY and MAINNET environment variables')
+}
+
+if (!PRIVATE_KEY.startsWith('0x')) {
+  throw new Error('private key must start with "0x"')
 }
 
 const ORDER_SERVER_URL = process.env.ORDER_SERVER_URL || 'http://localhost:5004/getOrder'
 
 const app = express()
+// json body parser middleware
 app.use(express.json())
-app.listen(5005, () => console.log('API client server listening on port 5005! Order server url: ' + ORDER_SERVER_URL))
-
-const airswap = new AirSwap({
-  privateKey: process.env.PRIVATE_KEY,
-  networkId: parseInt(process.env.MAINNET, 10) ? 'mainnet' : 'rinkeby',
-})
 
 const sendResponse = (res, data) => {
+  console.log(data)
   res.status(200).send(data)
 }
-
+const sendError = (req, res, err) => {
+  console.log(`Error ocurred when invoking method ${req.url}`)
+  console.log(err)
+  res.status(500).send(err)
+}
 const asyncMiddleware = fn => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch(next)
 }
+
+const wallet = new ethers.Wallet(PRIVATE_KEY)
+const address = wallet.address.toLowerCase()
+const messageSigner = data => wallet.signMessage(data)
+
+const routerParams = {
+  messageSigner,
+  address,
+  keyspace: false,
+  requireAuthentication: true,
+}
+
+const airswap = new Router(routerParams)
 
 // Relay getOrder requests from other peers to the order server
 airswap.RPC_METHOD_ACTIONS.getOrder = payload => {
@@ -33,91 +59,90 @@ airswap.RPC_METHOD_ACTIONS.getOrder = payload => {
     params = airswap.decryptMessage(params)
   }
   params.makerAddress = airswap.wallet.address
+
+  // Price the order
+  // const { makerParam, takerParam } = priceTrade(params)
+  // const order = {
+  //   nonce: `${Date.now()}`,
+  //   makerWallet: address,
+  //   takerWallet: params.takerWallet,
+  //   makerParam: makerParam,
+  //   takerParam: takerParam,
+  //   makerToken: params.makerToken,
+  //   takerToken: params.takerToken,
+  //   expiry: `${Math.round(new Date().getTime() / 1000) + 300}`, // Expire after 5 minutes
+  // }
+
   rp({
     method: 'POST',
     uri: ORDER_SERVER_URL,
     json: true,
     body: params,
-  }).then(orderParams => {
-    const signedOrder = airswap.signOrder({
-      ...orderParams,
-      makerAddress: airswap.wallet.address,
-      takerAddress: params.takerAddress,
-    })
-    airswap.call(
-      sender, // send order to address who requested it
-      { id: message.id, jsonrpc: '2.0', result: signedOrder } // response id should match their `message.id`
-    )
   })
+    .then(orderParams => {
+      // Sign the order
+      const signedOrder = Swap.signSwap(
+        nest({ ...orderParams, makerAddress: airswap.wallet.address, takerAddress: params.takerAddress }),
+        wallet,
+      )
+
+      airswap.call(
+        sender, // send order to address who requested it
+        { id: message.id, jsonrpc: '2.0', result: signedOrder }, // response id should match their `message.id`
+      )
+      return signedOrder
+    })
+    .catch(e => console.log(e.message))
 }
 
 // Standard API Methods
-app.post(
-  '/findIntents',
-  asyncMiddleware(async (req, res) => {
-    const { makerTokens, takerTokens, role = 'maker' } = req.body
-    const intents = await airswap.findIntents(makerTokens, takerTokens, role)
-    sendResponse(res, intents)
-  })
-)
+app.post('/findIntents', async (req, res) => {
+  const { makerTokens, takerTokens, role = 'maker' } = req.body
+  const intents = await airswap.findIntents(makerTokens, takerTokens, role)
+  sendResponse(res, intents)
+})
 
 app.post(
   '/getIntents',
   asyncMiddleware(async (req, res) => {
-    const { address } = req.body
-    const intents = await airswap.getIntents(address)
+    const intents = await airswap.getIntents(req.body.address)
     sendResponse(res, intents)
-  })
+  }),
 )
 
-app.post(
-  '/setIntents',
-  asyncMiddleware(async (req, res) => {
-    const intents = req.body.length ? req.body : null
-    const data = await airswap.setIntents(intents)
-    sendResponse(res, data)
-  })
-)
+app.post('/setIntents', async (req, res) => {
+  const intents = req.body.length ? req.body : null
+  const data = await airswap.setIntents(intents)
+  sendResponse(res, data)
+})
 
-app.post(
-  '/getOrder',
-  asyncMiddleware(async (req, res) => {
-    const { makerAddress, params } = req.body
-    try {
-      const order = await airswap.getOrder(makerAddress, params)
-      sendResponse(res, order)
-    } catch (e) {
-      sendResponse(res, e.message)
-    }
-  })
-)
+app.post('/getOrder', async (req, res) => {
+  const { makerAddress, params } = req.body
+  try {
+    const order = await airswap.getOrder(makerAddress, params)
+    sendResponse(res, order)
+  } catch (e) {
+    sendResponse(res, e.message)
+  }
+})
 
-app.post(
-  '/getOrders',
-  asyncMiddleware(async (req, res) => {
-    const { intents, makerAmount } = req.body
-    const orders = await airswap.getOrders(intents, makerAmount)
-    sendResponse(res, orders)
-  })
-)
+app.post('/getOrders', async (req, res) => {
+  const { intents, makerAmount } = req.body
+  const orders = await airswap.getOrders(intents, makerAmount)
+  sendResponse(res, orders)
+})
 
-app.post(
-  '/getQuote',
-  asyncMiddleware(async (req, res) => {
-    const { makerAddress, makerToken, takerToken, makerAmount, takerAmount } = req.body
-    const quote = await airswap.getQuote({ makerAddress, makerToken, takerToken, makerAmount, takerAmount })
-    sendResponse(res, quote)
-  })
-)
+app.post('/getQuote', async (req, res) => {
+  const { makerAddress, makerToken, takerToken, makerAmount, takerAmount } = req.body
+  const quote = await airswap.getQuote({ makerAddress, makerToken, takerToken, makerAmount, takerAmount })
+  sendResponse(res, quote)
+})
 
-app.post(
-  '/getMaxQuote',
-  asyncMiddleware(async (req, res) => {
-    const { makerAddress, makerToken, takerToken } = req.body
-    const quote = await airswap.getMaxQuote({ makerAddress, makerToken, takerToken })
-    sendResponse(res, quote)
-  })
-)
+app.post('/getMaxQuote', async (req, res) => {
+  const { makerAddress, makerToken, takerToken } = req.body
+  const quote = await airswap.getMaxQuote({ makerAddress, makerToken, takerToken })
+  sendResponse(res, quote)
+})
 
 app.post('/signOrder', (req, res) => {
   const { makerAddress, makerAmount, makerToken, takerAddress, takerAmount, takerToken, expiration, nonce } = req.body
@@ -132,53 +157,47 @@ app.post('/signOrder', (req, res) => {
       takerToken,
       expiration,
       nonce,
-    })
+    }),
   )
 })
 
-app.post(
-  '/fillOrder',
-  asyncMiddleware(async (req, res) => {
-    const { order, config } = req.body
-    const tx = await airswap.fillOrder(order, config)
-    sendResponse(res, tx)
-  })
-)
+app.post('/fillOrder', async (req, res) => {
+  const { order, config } = req.body
+  const tx = await airswap.fillOrder(order, config)
+  sendResponse(res, tx)
+})
 
-app.post(
-  '/unwrapWeth',
-  asyncMiddleware(async (req, res) => {
-    const { amount, config } = req.body
-    const tx = await airswap.unwrapWeth(amount, config)
-    sendResponse(res, tx)
-  })
-)
+app.post('/unwrapWeth', async (req, res) => {
+  const { amount, config } = req.body
+  const tx = await airswap.unwrapWeth(amount, config)
+  sendResponse(res, tx)
+})
 
-app.post(
-  '/wrapWeth',
-  asyncMiddleware(async (req, res) => {
-    const { amount, config } = req.body
-    const tx = await airswap.wrapWeth(amount, config)
-    sendResponse(res, tx)
-  })
-)
+app.post('/wrapWeth', async (req, res) => {
+  const { amount, config } = req.body
+  const tx = await airswap.wrapWeth(amount, config)
+  sendResponse(res, tx)
+})
 
-app.post(
-  '/approveTokenForTrade',
-  asyncMiddleware(async (req, res) => {
-    const { tokenContractAddr, config } = req.body
-    const tx = await airswap.approveTokenForTrade(tokenContractAddr, config)
-    sendResponse(res, tx)
-  })
-)
+app.post('/approveTokenForTrade', async (req, res) => {
+  const { tokenContractAddr, config } = req.body
+  const tx = await airswap.approveTokenForTrade(tokenContractAddr, config)
+  sendResponse(res, tx)
+})
 
-app.post(
-  '/registerPGPKey',
-  asyncMiddleware(async (req, res) => {
-    const tx = await airswap.registerPGPKey()
-    sendResponse(res, tx)
-  })
-)
+app.post('/registerPGPKey', async (req, res) => {
+  const tx = await airswap.registerPGPKey()
+  sendResponse(res, tx)
+})
 
 // Connect to AirSwap and listen for POSTs
 airswap.connect()
+
+// custom error handling middleware
+app.use((err, req, res, next) => {
+  console.error(`Error ocurred when invoking method ${req.url}`)
+  console.log(err)
+  res.status(500).send(err)
+})
+
+app.listen(5005, () => console.log(`API client server listening on port 5005! Order server url: ${ORDER_SERVER_URL}`))

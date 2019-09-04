@@ -4,10 +4,11 @@
     "commonjs": true,
     "es6": true
   },
-  "extends": ["eslint-config-airbnb-base", "plugin:prettier/recommended"],
+  "extends": ["eslint-config-airbnb-base", "plugin:prettier/recommended", "plugin:promise/recommended"],
   "plugins": ["promise"],
   "rules": {
-    "semi": ["error", "never"]
+    "semi": ["error", "never"],
+    "no-console": 0
   },
   "globals": {
     "Atomics": "readonly",
