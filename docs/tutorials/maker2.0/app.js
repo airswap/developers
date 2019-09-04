@@ -39,7 +39,6 @@ console.log(`connecting to ${router.socketUrl}`)
 function priceTrade(params) {
   // Assume a fixed price of 0.01 DAI/WETH
   // You should implement your own pricing logic here.
-  debugger
   const price = 200
 
   let makerParam
