@@ -4,12 +4,31 @@
   "description": "AirSwap Maker Tutorial",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start:dev": "ENV='development' node app.js",
+    "start:prod": "ENV='production' node app.js",
+    "build": "NODE_ENV='production' babel app.js -d public --copy-files",
+    "logs": "heroku logs --tail"
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "airswap.js": "0.1.4",
+    "@babel/register": "^7.5.5",
+    "airswap.js": "0.1.13",
     "bignumber.js": "^9.0.0",
     "dotenv": "^8.1.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.0",
+    "@babel/core": "^7.1.0",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-flow": "^7.0.0",
+    "@babel/preset-react": "^7.0.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-eslint": "^8.2.5",
+    "babel-jest": "^23.6.0",
+    "babel-plugin-transform-remove-console": "^6.9.4"
+  },
+  "engines": {
+    "node": "10.16.0"
   }
 }
