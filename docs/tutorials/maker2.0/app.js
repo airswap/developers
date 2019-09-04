@@ -100,13 +100,13 @@ async function getQuote(payload) {
   const { makerParam, takerParam } = priceTrade(params)
 
   // Construct the quote
-  const quote = {
+  const quote = nest({
     makerParam: makerParam,
     takerParam: takerParam,
     makerToken: params.makerToken,
     takerToken: params.takerToken,
     makerWallet: address,
-  }
+  })
 
   // Construct a JSON RPC response
   response = {
@@ -133,12 +133,12 @@ async function getMaxQuote(payload) {
   // Price the trade for the maximum amount
   const { makerParam, takerParam } = priceTrade(params)
 
-  const quote = {
+  const quote = nest({
     ...params,
     makerParam,
     takerParam,
     makerWallet: address
-  }
+  })
 
   // Construct a JSON RPC response
   response = {
