@@ -173,7 +173,7 @@ async function main() {
       makerToken,
       takerToken,
       role: 'maker',
-      supportedMethods: ["getOrder", "getQuote", "getMaxQuote"],
+      supportedMethods: ["getMakerSideOrder", "getTakerSideOrder", "getMakerSideQuote", "getTakerSideQuote", "getMaxQuote"],
       swapVersion: 2
     }
   ]
