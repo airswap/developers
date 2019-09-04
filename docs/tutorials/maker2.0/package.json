@@ -12,7 +12,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@babel/register": "^7.5.5",
-    "airswap.js": "0.1.13",
+    "airswap.js": "0.1.14",
     "bignumber.js": "^9.0.0",
     "dotenv": "^8.1.0"
   },
