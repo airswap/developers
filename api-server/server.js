@@ -25,15 +25,8 @@ const app = express()
 // json body parser middleware
 app.use(express.json())
 
-const sendResponse = (res, data) => {
-  console.log(data)
-  res.status(200).send(data)
-}
-const sendError = (req, res, err) => {
-  console.log(`Error ocurred when invoking method ${req.url}`)
-  console.log(err)
-  res.status(500).send(err)
-}
+const sendResponse = (res, data) => res.status(200).send(data)
+
 const asyncMiddleware = fn => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch(next)
 }
@@ -51,27 +44,24 @@ const routerParams = {
 
 const airswap = new Router(routerParams)
 
-// Relay getOrder requests from other peers to the order server
-airswap.RPC_METHOD_ACTIONS.getOrder = payload => {
+/**  RPC METHODS
+ * These methods are called when other peers on the AirSwap
+ * network contact us to request a quote or an order
+ * getMakerSideOrder
+ * getTakerSideOrder
+ * getMakerSideQuote
+ * getTakerSideQuote
+ * getMaxQuote
+ */
+
+const getOrder = payload => {
   const { message, sender, receiver } = payload
   let { params } = message
   if (typeof params === 'string' && params.startsWith('-----BEGIN PGP MESSAGE-----')) {
     params = airswap.decryptMessage(params)
   }
-  params.makerAddress = airswap.wallet.address
 
-  // Price the order
-  // const { makerParam, takerParam } = priceTrade(params)
-  // const order = {
-  //   nonce: `${Date.now()}`,
-  //   makerWallet: address,
-  //   takerWallet: params.takerWallet,
-  //   makerParam: makerParam,
-  //   takerParam: takerParam,
-  //   makerToken: params.makerToken,
-  //   takerToken: params.takerToken,
-  //   expiry: `${Math.round(new Date().getTime() / 1000) + 300}`, // Expire after 5 minutes
-  // }
+  params.makerAddress = airswap.wallet.address
 
   rp({
     method: 'POST',
@@ -95,7 +85,18 @@ airswap.RPC_METHOD_ACTIONS.getOrder = payload => {
     .catch(e => console.log(e.message))
 }
 
-// Standard API Methods
+airswap.RPC_METHOD_ACTIONS.getMakerSideOrder = getOrder
+airswap.RPC_METHOD_ACTIONS.getTakerSideOrder = getOrder
+
+/* END RPC METHODS */
+
+/**
+ * Standard API Methods
+ * These are methods that you call on your server locally to interact with others
+ * on the AirSwap network, or to perform general tasks such as approving tokens
+ * for trade and setting intents on the indexer.
+ */
+
 app.post('/findIntents', async (req, res) => {
   const { makerTokens, takerTokens, role = 'maker' } = req.body
   const intents = await airswap.findIntents(makerTokens, takerTokens, role)
@@ -190,10 +191,13 @@ app.post('/registerPGPKey', async (req, res) => {
   sendResponse(res, tx)
 })
 
+/* END STANDARD API METHODS */
+
 // Connect to AirSwap and listen for POSTs
 airswap.connect()
 
 // custom error handling middleware
+// `next` _must_ be defined in the funciton signature here or else Express will not apply this custom error handling middleware!
 app.use((err, req, res, next) => {
   console.error(`Error ocurred when invoking method ${req.url}`)
   console.log(err)

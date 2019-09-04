@@ -8,7 +8,8 @@
   "plugins": ["promise"],
   "rules": {
     "semi": ["error", "never"],
-    "no-console": 0
+    "no-console": 0,
+    "no-unused-vars": "warn"
   },
   "globals": {
     "Atomics": "readonly",
