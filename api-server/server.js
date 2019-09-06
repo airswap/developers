@@ -97,11 +97,14 @@ airswap.RPC_METHOD_ACTIONS.getTakerSideOrder = getOrder
  * for trade and setting intents on the indexer.
  */
 
-app.post('/findIntents', async (req, res) => {
-  const { makerTokens, takerTokens, role = 'maker' } = req.body
-  const intents = await airswap.findIntents(makerTokens, takerTokens, role)
-  sendResponse(res, intents)
-})
+app.post(
+  '/findIntents',
+  asyncMiddleware(async (req, res) => {
+    const { makerTokens, takerTokens, role = 'maker' } = req.body
+    const intents = await airswap.findIntents(makerTokens, takerTokens, role)
+    sendResponse(res, intents)
+  }),
+)
 
 app.post(
   '/getIntents',
@@ -111,39 +114,54 @@ app.post(
   }),
 )
 
-app.post('/setIntents', async (req, res) => {
-  const intents = req.body.length ? req.body : null
-  const data = await airswap.setIntents(intents)
-  sendResponse(res, data)
-})
+app.post(
+  '/setIntents',
+  asyncMiddleware(async (req, res) => {
+    const intents = req.body.length ? req.body : null
+    const data = await airswap.setIntents(intents)
+    sendResponse(res, data)
+  }),
+)
 
-app.post('/getOrder', async (req, res) => {
-  const { makerAddress, params } = req.body
-  try {
-    const order = await airswap.getOrder(makerAddress, params)
-    sendResponse(res, order)
-  } catch (e) {
-    sendResponse(res, e.message)
-  }
-})
+app.post(
+  '/getOrder',
+  asyncMiddleware(async (req, res) => {
+    const { makerAddress, params } = req.body
+    try {
+      const order = await airswap.getOrder(makerAddress, params)
+      sendResponse(res, order)
+    } catch (e) {
+      sendResponse(res, e.message)
+    }
+  }),
+)
 
-app.post('/getOrders', async (req, res) => {
-  const { intents, makerAmount } = req.body
-  const orders = await airswap.getOrders(intents, makerAmount)
-  sendResponse(res, orders)
-})
+app.post(
+  '/getOrders',
+  asyncMiddleware(async (req, res) => {
+    const { intents, makerAmount } = req.body
+    const orders = await airswap.getOrders(intents, makerAmount)
+    sendResponse(res, orders)
+  }),
+)
 
-app.post('/getQuote', async (req, res) => {
-  const { makerAddress, makerToken, takerToken, makerAmount, takerAmount } = req.body
-  const quote = await airswap.getQuote({ makerAddress, makerToken, takerToken, makerAmount, takerAmount })
-  sendResponse(res, quote)
-})
+app.post(
+  '/getQuote',
+  asyncMiddleware(async (req, res) => {
+    const { makerAddress, makerToken, takerToken, makerAmount, takerAmount } = req.body
+    const quote = await airswap.getQuote({ makerAddress, makerToken, takerToken, makerAmount, takerAmount })
+    sendResponse(res, quote)
+  }),
+)
 
-app.post('/getMaxQuote', async (req, res) => {
-  const { makerAddress, makerToken, takerToken } = req.body
-  const quote = await airswap.getMaxQuote({ makerAddress, makerToken, takerToken })
-  sendResponse(res, quote)
-})
+app.post(
+  '/getMaxQuote',
+  asyncMiddleware(async (req, res) => {
+    const { makerAddress, makerToken, takerToken } = req.body
+    const quote = await airswap.getMaxQuote({ makerAddress, makerToken, takerToken })
+    sendResponse(res, quote)
+  }),
+)
 
 app.post('/signOrder', (req, res) => {
   const { makerAddress, makerAmount, makerToken, takerAddress, takerAmount, takerToken, expiration, nonce } = req.body
@@ -162,34 +180,49 @@ app.post('/signOrder', (req, res) => {
   )
 })
 
-app.post('/fillOrder', async (req, res) => {
-  const { order, config } = req.body
-  const tx = await airswap.fillOrder(order, config)
-  sendResponse(res, tx)
-})
+app.post(
+  '/fillOrder',
+  asyncMiddleware(async (req, res) => {
+    const { order, config } = req.body
+    const tx = await airswap.fillOrder(order, config)
+    sendResponse(res, tx)
+  }),
+)
 
-app.post('/unwrapWeth', async (req, res) => {
-  const { amount, config } = req.body
-  const tx = await airswap.unwrapWeth(amount, config)
-  sendResponse(res, tx)
-})
+app.post(
+  '/unwrapWeth',
+  asyncMiddleware(async (req, res) => {
+    const { amount, config } = req.body
+    const tx = await airswap.unwrapWeth(amount, config)
+    sendResponse(res, tx)
+  }),
+)
 
-app.post('/wrapWeth', async (req, res) => {
-  const { amount, config } = req.body
-  const tx = await airswap.wrapWeth(amount, config)
-  sendResponse(res, tx)
-})
+app.post(
+  '/wrapWeth',
+  asyncMiddleware(async (req, res) => {
+    const { amount, config } = req.body
+    const tx = await airswap.wrapWeth(amount, config)
+    sendResponse(res, tx)
+  }),
+)
 
-app.post('/approveTokenForTrade', async (req, res) => {
-  const { tokenContractAddr, config } = req.body
-  const tx = await airswap.approveTokenForTrade(tokenContractAddr, config)
-  sendResponse(res, tx)
-})
+app.post(
+  '/approveTokenForTrade',
+  asyncMiddleware(async (req, res) => {
+    const { tokenContractAddr, config } = req.body
+    const tx = await airswap.approveTokenForTrade(tokenContractAddr, config)
+    sendResponse(res, tx)
+  }),
+)
 
-app.post('/registerPGPKey', async (req, res) => {
-  const tx = await airswap.registerPGPKey()
-  sendResponse(res, tx)
-})
+app.post(
+  '/registerPGPKey',
+  asyncMiddleware(async (req, res) => {
+    const tx = await airswap.registerPGPKey()
+    sendResponse(res, tx)
+  }),
+)
 
 /* END STANDARD API METHODS */
 
