@@ -274,9 +274,8 @@ app.post(
 app.post(
   '/approveTokenForTrade',
   asyncMiddleware(async (req, res) => {
-    const { tokenContractAddr, config } = req.body
-    // const tx = await airswap.approveTokenForTrade(tokenContractAddr, config)
-    const tx = ERC20.approveToken(tokenContractAddr, SWAP_CONTRACT_ADDRESS, wallet)
+    const { tokenContractAddr } = req.body
+    const tx = await ERC20.approveToken(tokenContractAddr, SWAP_CONTRACT_ADDRESS, wallet)
     sendResponse(res, tx)
   }),
 )
