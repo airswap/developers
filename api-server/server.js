@@ -256,8 +256,8 @@ app.post(
 app.post(
   '/unwrapWeth',
   asyncMiddleware(async (req, res) => {
-    const { amount, config } = req.body
-    const tx = await airswap.unwrapWeth(amount, config)
+    const { amount } = req.body
+    const tx = await ERC20.unwrapWeth(amount, wallet)
     sendResponse(res, tx)
   }),
 )
@@ -265,8 +265,8 @@ app.post(
 app.post(
   '/wrapWeth',
   asyncMiddleware(async (req, res) => {
-    const { amount, config } = req.body
-    const tx = await airswap.wrapWeth(amount, config)
+    const { amount } = req.body
+    const tx = await ERC20.wrapWeth(amount, wallet)
     sendResponse(res, tx)
   }),
 )
