@@ -5,7 +5,7 @@
   "main": "server.js",
   "author": "AirSwap",
   "scripts": {
-    "lint": "eslint server.js lib/AirSwap.js"
+    "lint": "eslint server.js order-server-examples/nodejs/**.js"
   },
   "dependencies": {
     "airswap.js": "^0.1.14",

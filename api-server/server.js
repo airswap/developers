@@ -2,8 +2,10 @@ const express = require('express')
 const rp = require('request-promise')
 const ethers = require('ethers')
 const Router = require('airswap.js/src/protocolMessaging')
+const ERC20 = require('airswap.js/src/erc20')
 const Swap = require('airswap.js/src/swap')
 const { nest } = require('airswap.js/src/swap/utils')
+const { SWAP_CONTRACT_ADDRESS } = require('airswap.js/src/constants')
 
 const { PRIVATE_KEY, ENV } = process.env
 
@@ -228,26 +230,25 @@ app.post(
 
 app.post('/signOrder', (req, res) => {
   const { makerAddress, makerAmount, makerToken, takerAddress, takerAmount, takerToken, expiration, nonce } = req.body
-  sendResponse(
-    res,
-    airswap.signOrder({
-      makerAddress,
-      makerAmount,
-      makerToken,
-      takerAddress,
-      takerAmount,
-      takerToken,
-      expiration,
-      nonce,
-    }),
-  )
+  const order = {
+    makerAddress,
+    makerAmount,
+    makerToken,
+    takerAddress,
+    takerAmount,
+    takerToken,
+    expiration,
+    nonce,
+  }
+  const signedSwap = Swap.signSwap(nest(order), wallet)
+  sendResponse(res, signedSwap)
 })
 
 app.post(
   '/fillOrder',
   asyncMiddleware(async (req, res) => {
-    const { order, config } = req.body
-    const tx = await airswap.fillOrder(order, config)
+    const { order } = req.body
+    const tx = await Swap.swap(order, wallet)
     sendResponse(res, tx)
   }),
 )
@@ -274,7 +275,8 @@ app.post(
   '/approveTokenForTrade',
   asyncMiddleware(async (req, res) => {
     const { tokenContractAddr, config } = req.body
-    const tx = await airswap.approveTokenForTrade(tokenContractAddr, config)
+    // const tx = await airswap.approveTokenForTrade(tokenContractAddr, config)
+    const tx = ERC20.approveToken(tokenContractAddr, SWAP_CONTRACT_ADDRESS, wallet)
     sendResponse(res, tx)
   }),
 )
