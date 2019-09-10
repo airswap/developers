@@ -19,10 +19,11 @@ if (!PRIVATE_KEY.startsWith('0x')) {
   throw new Error('private key must start with "0x"')
 }
 
-const ORDER_SERVER_URL = process.env.ORDER_SERVER_URL || 'http://localhost:5004/getOrder'
+// You _must_ set up an order server if you want to provide orders on the AirSwap network
+// check out the order-server-examples/ directory for working examples
+const ORDER_SERVER_URL = process.env.ORDER_SERVER_URL || 'http://localhost:5004'
 
 const app = express()
-// json body parser middleware
 app.use(express.json())
 
 const sendResponse = (res, data) => res.status(200).send(data)
@@ -46,7 +47,10 @@ const airswap = new Router(routerParams)
 
 /**  RPC METHODS
  * These methods are called when other peers on the AirSwap
- * network contact us to request a quote or an order
+ * network contact us to request a quote or an order.
+ * You must implement an order server at `ORDER_SERVER_URL`
+ * with the routes /getOrder, /getQuote, and /getMaxQuote
+ * to receive and process these forwarded requests.
  * getMakerSideOrder
  * getTakerSideOrder
  * getMakerSideQuote
@@ -55,7 +59,7 @@ const airswap = new Router(routerParams)
  */
 
 const getOrder = payload => {
-  const { message, sender, receiver } = payload
+  const { message, sender } = payload
   let { params } = message
   if (typeof params === 'string' && params.startsWith('-----BEGIN PGP MESSAGE-----')) {
     params = airswap.decryptMessage(params)
@@ -63,30 +67,89 @@ const getOrder = payload => {
 
   params.makerAddress = airswap.wallet.address
 
+  // forward the order request to our Order Server and wait for a response
   rp({
     method: 'POST',
-    uri: ORDER_SERVER_URL,
+    uri: `${ORDER_SERVER_URL}/getOrder`,
     json: true,
     body: params,
   })
     .then(orderParams => {
-      // Sign the order
+      // Once we receive the order back from our Order Server, let's sign it
       const signedOrder = Swap.signSwap(
         nest({ ...orderParams, makerAddress: airswap.wallet.address, takerAddress: params.takerAddress }),
         wallet,
       )
 
+      // Last, let's send our signed order back to the address who requested it
       airswap.call(
-        sender, // send order to address who requested it
-        { id: message.id, jsonrpc: '2.0', result: signedOrder }, // response id should match their `message.id`
+        sender,
+        { id: message.id, jsonrpc: '2.0', result: signedOrder }, // response id matches their `message.id`
       )
       return signedOrder
     })
     .catch(e => console.log(e.message))
 }
 
+const getQuote = payload => {
+  const { message, sender } = payload
+  let { params } = message
+  if (typeof params === 'string' && params.startsWith('-----BEGIN PGP MESSAGE-----')) {
+    params = airswap.decryptMessage(params)
+  }
+
+  params.makerAddress = airswap.wallet.address
+
+  // forward the quote request to our Order Server and wait for a response
+  rp({
+    method: 'POST',
+    uri: `${ORDER_SERVER_URL}/getQuote`,
+    json: true,
+    body: params,
+  })
+    .then(quote => {
+      // no need to sign anything before sending the quote back because this is just a price quote (not a firm order)
+      airswap.call(
+        sender,
+        { id: message.id, jsonrpc: '2.0', result: quote }, // response id matches their `message.id`
+      )
+      return quote
+    })
+    .catch(e => console.log(e.message))
+}
+
+// This method is called in order for you to signal the largest trade you can provide
+// It is a vital indicator of maximum liquidity in the AirSwap ecosystem.
+const getMaxQuote = payload => {
+  const { message, sender } = payload
+  let { params } = message
+  if (typeof params === 'string' && params.startsWith('-----BEGIN PGP MESSAGE-----')) {
+    params = airswap.decryptMessage(params)
+  }
+
+  // forward the maxQuote request to our Order Server and wait for a response
+  rp({
+    method: 'POST',
+    uri: `${ORDER_SERVER_URL}/getMaxQuote`,
+    json: true,
+    body: params,
+  })
+    .then(maxQuote => {
+      // no need to sign anything before sending the maxQuote back because this is just a price maxQuote (not a firm order)
+      airswap.call(
+        sender,
+        { id: message.id, jsonrpc: '2.0', result: maxQuote }, // response id matches their `message.id`
+      )
+      return maxQuote
+    })
+    .catch(e => console.log(e.message))
+}
+
 airswap.RPC_METHOD_ACTIONS.getMakerSideOrder = getOrder
 airswap.RPC_METHOD_ACTIONS.getTakerSideOrder = getOrder
+airswap.RPC_METHOD_ACTIONS.getMakerSideQuote = getQuote
+airswap.RPC_METHOD_ACTIONS.getTakerSideQuote = getQuote
+airswap.RPC_METHOD_ACTIONS.getMaxQuote = getMaxQuote
 
 /* END RPC METHODS */
 
