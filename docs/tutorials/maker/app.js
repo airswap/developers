@@ -27,15 +27,19 @@ const routerParams = {
 const router = new Router(routerParams)
 
 function priceTrade(params) {
-  // Assume a fixed price of 0.01 ETH/AST
-  // You should implement your own pricing logic here.
-  const price = 0.01
+  /**
+   * YOU SHOULD IMPLEMENT YOUR OWN PRICING LOGIC HERE.
+   * */
+
+  // You probably want a bunch of conditionals,hedging logic, etc. here..
+  // In our naive example, let's assume a fixed price of 1 TGBP/TUSD
+  const price = 1
 
   let makerAmount
   let takerAmount
 
   if (params.makerAmount) {
-    // Maker amount specified, calculate the amount taker must send
+    // Maker amount specified by user, so we calculate the takerAmount
     makerAmount = params.makerAmount
     const makerAmountDecimals = TokenMetadata.formatDisplayValueByToken(
       { address: params.makerToken },
@@ -44,7 +48,7 @@ function priceTrade(params) {
     const takerAmountDecimals = makerAmountDecimals * price
     takerAmount = TokenMetadata.formatAtomicValueByToken({ address: params.takerToken }, takerAmountDecimals)
   } else if (params.takerAmount) {
-    // Taker amount specified, calculate the amount maker must send
+    // Taker amount specified by user, so we calculate the makerAmount
     takerAmount = params.takerAmount
     const takerAmountDecimals = TokenMetadata.formatDisplayValueByToken(
       { address: params.takerToken },
@@ -118,7 +122,7 @@ async function getQuote(payload) {
 
   // Send the quote
   router.call(payload.sender, response)
-  // console.log('sent quote', response)
+  console.log('sent quote', response)
 }
 
 async function getMaxQuote(payload) {
@@ -158,7 +162,7 @@ async function getMaxQuote(payload) {
 
   // Send the max quote
   router.call(payload.sender, response)
-  // console.log('sent max quote', response)
+  console.log('sent max quote', response)
 }
 
 async function main() {
@@ -169,23 +173,74 @@ async function main() {
 
   // Fetch token metadata
   await TokenMetadata.ready
-  const { ETH, AST } = TokenMetadata.tokenAddressesBySymbol
-  // 2. Set an intent to trade AST/ETH
-  // Your wallet must have 250 AST to complete this step.
+  const { TUSD, TGBP, TCAD, THKD, TAUD, DAI } = TokenMetadata.tokenAddressesBySymbol
+  // 2. Set an intent for each side of the market we want to make
+  // Your wallet must have 250 AST per intent to complete this step
   // Get testnet AST from the rinkeby faucet
   // https://ast-faucet-ui.development.airswap.io
 
+  console.log(TUSD, TGBP, TCAD, THKD, TAUD)
   await router
     .setIntents([
       {
-        makerToken: AST,
-        takerToken: ETH,
+        makerToken: TUSD,
+        takerToken: TGBP,
         role: 'maker',
-        supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        // supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        swapVersion: 1,
+      },
+      {
+        makerToken: TUSD,
+        takerToken: TCAD,
+        role: 'maker',
+        // supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        swapVersion: 1,
+      },
+      {
+        makerToken: TUSD,
+        takerToken: THKD,
+        role: 'maker',
+        // supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        swapVersion: 1,
+      },
+      {
+        makerToken: TUSD,
+        takerToken: TAUD,
+        role: 'maker',
+        // supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        swapVersion: 1,
+      },
+      {
+        makerToken: TGBP,
+        takerToken: TUSD,
+        role: 'maker',
+        // supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        swapVersion: 1,
+      },
+      {
+        makerToken: TCAD,
+        takerToken: TUSD,
+        role: 'maker',
+        // supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        swapVersion: 1,
+      },
+      {
+        makerToken: THKD,
+        takerToken: TUSD,
+        role: 'maker',
+        // supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        swapVersion: 1,
+      },
+      {
+        makerToken: TAUD,
+        takerToken: TUSD,
+        role: 'maker',
+        // supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        swapVersion: 1,
       },
     ])
     .then(() => {
-      console.log('setIntents for AST/ETH')
+      console.log('set intents successfully')
     })
     .catch(e => {
       console.log('unable to setIntents', e)

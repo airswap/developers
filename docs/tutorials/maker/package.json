@@ -8,7 +8,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "airswap.js": "^0.0.21",
+    "airswap.js": "0.1.31",
     "bignumber.js": "^9.0.0"
   }
 }
