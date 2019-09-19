@@ -136,36 +136,23 @@ async function getMaxQuote(payload) {
   // Get our token balances to see how much liquidity we have available
   const balances = await DeltaBalances.getManyBalancesManyAddresses([params.makerToken], [address])
   const makerTokenBalance = balances[address][params.makerToken]
-  const takerTokenBalance = balances[address][params.takerToken]
-
-  // Construct a JSON RPC response
-  let response = {
-    id: payload.message.id,
-    jsonrpc: '2.0',
-  }
-
-  // Set the maker or taker amount depending on the available balance
-  if (TokenMetadata.tokenSymbolsByAddress[params.takerToken] == 'ETH') {
-    params.makerAmount = makerTokenBalance
-  } else if (TokenMetadata.tokenSymbolsByAddress[params.makerToken == 'WETH']) {
-    params.takerAmount = takerTokenBalance
-  } else {
-    // We can't make this trade. It'd be a good idea to send a response here but none is required.
-    response.result = {}
-    router.call(payload.sender, response)
-  }
 
   // Price the trade for the maximum amount
-  const { makerAmount, takerAmount } = priceTrade(params)
+  const { makerAmount, takerAmount } = priceTrade({ makerAmount: makerTokenBalance, ...params })
   const quote = {
     ...params,
     makerAmount,
     takerAmount,
   }
 
-  response.result = quote
-  router.call(payload.sender, response)
+  // Construct a JSON RPC response
+  const response = {
+    id: payload.message.id,
+    jsonrpc: '2.0',
+    result: quote,
+  }
 
+  router.call(payload.sender, response)
   console.log('sent max quote', response)
 }
 
@@ -178,12 +165,12 @@ async function approveTokensForTrade(tokens) {
 
   // we can't do this efficiently with Promise.all. Have to submit one by one otherwise we'll end up
   // sending transactions to the network faster than the network can propagate the “pending” nonce
-  const sleep = () => new Promise((res, rej) => setTimeout(res, 5000))
   for (const [tokenAddress] of tokens) {
     console.log(`submitting approval for ${tokenAddress}..`)
     const tx = await approveToken(tokenAddress, SWAP_LEGACY_CONTRACT_ADDRESS, wallet)
     console.log(`submitted tx: ${tx.hash}`)
-    await sleep()
+    const receipt = await tx.wait()
+    console.log(`mined tx: ${receipt.transactionHash}`)
   }
 }
 
