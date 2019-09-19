@@ -2,6 +2,9 @@ const ethers = require('ethers')
 const Router = require('AirSwap.js/src/protocolMessaging')
 const TokenMetadata = require('AirSwap.js/src/tokens')
 const DeltaBalances = require('AirSwap.js/src/deltaBalances')
+const { getDeltaBalancesWalletAllowances } = require('AirSwap.js/src/deltaBalances/contractFunctions')
+const { SWAP_LEGACY_CONTRACT_ADDRESS, httpProvider } = require('AirSwap.js/src/constants')
+const { approveToken } = require('AirSwap.js/src/erc20')
 
 const PK = process.env.PRIVATE_KEY
 const ENV = process.env.ENV
@@ -14,7 +17,7 @@ if (!PK) {
   process.exit(0)
 }
 
-const wallet = new ethers.Wallet(PK)
+const wallet = new ethers.Wallet(PK, httpProvider)
 const address = wallet.address.toLowerCase()
 const messageSigner = data => wallet.signMessage(data)
 const routerParams = {
@@ -135,6 +138,12 @@ async function getMaxQuote(payload) {
   const makerTokenBalance = balances[address][params.makerToken]
   const takerTokenBalance = balances[address][params.takerToken]
 
+  // Construct a JSON RPC response
+  let response = {
+    id: payload.message.id,
+    jsonrpc: '2.0',
+  }
+
   // Set the maker or taker amount depending on the available balance
   if (TokenMetadata.tokenSymbolsByAddress[params.takerToken] == 'ETH') {
     params.makerAmount = makerTokenBalance
@@ -142,7 +151,8 @@ async function getMaxQuote(payload) {
     params.takerAmount = takerTokenBalance
   } else {
     // We can't make this trade. It'd be a good idea to send a response here but none is required.
-    return
+    response.result = {}
+    router.call(payload.sender, response)
   }
 
   // Price the trade for the maximum amount
@@ -153,16 +163,28 @@ async function getMaxQuote(payload) {
     takerAmount,
   }
 
-  // Construct a JSON RPC response
-  response = {
-    id: payload.message.id,
-    jsonrpc: '2.0',
-    result: quote,
+  response.result = quote
+  router.call(payload.sender, response)
+
+  console.log('sent max quote', response)
+}
+
+async function approveTokensForTrade(tokens) {
+  const walletEthBalance = await wallet.getBalance()
+  if (walletEthBalance === 0) {
+    console.error('Wallet balance is empty. Need some ETH to submit approval transactions')
+    process.exit(0)
   }
 
-  // Send the max quote
-  router.call(payload.sender, response)
-  console.log('sent max quote', response)
+  // we can't do this efficiently with Promise.all. Have to submit one by one otherwise we'll end up
+  // sending transactions to the network faster than the network can propagate the “pending” nonce
+  const sleep = () => new Promise((res, rej) => setTimeout(res, 5000))
+  for (const [tokenAddress] of tokens) {
+    console.log(`submitting approval for ${tokenAddress}..`)
+    const tx = await approveToken(tokenAddress, SWAP_LEGACY_CONTRACT_ADDRESS, wallet)
+    console.log(`submitted tx: ${tx.hash}`)
+    await sleep()
+  }
 }
 
 async function main() {
@@ -173,69 +195,92 @@ async function main() {
 
   // Fetch token metadata
   await TokenMetadata.ready
-  const { TUSD, TGBP, TCAD, THKD, TAUD, DAI } = TokenMetadata.tokenAddressesBySymbol
-  // 2. Set an intent for each side of the market we want to make
+  const { TUSD, TGBP, TCAD, THKD, TAUD } = TokenMetadata.tokenAddressesBySymbol
+  const tokenAddresses = [TUSD, TGBP, TCAD, THKD, TAUD]
+
+  // Check to see if we've approved the Swap contract as a spender of these tokens yet
+  const tokensNeedApproval = (await getDeltaBalancesWalletAllowances(
+    address,
+    SWAP_LEGACY_CONTRACT_ADDRESS,
+    tokenAddresses,
+  ))
+    .map((allowanceBigNumber, idx) => [tokenAddresses[idx], allowanceBigNumber.toString()])
+    .filter(([tokenAddress, tokenAllowance]) => {
+      if (tokenAllowance === '0') {
+        console.error(
+          `Allowance for ${tokenAddress} is 0. Trades will fail until Swap contract is approved as a spender`,
+        )
+        return true
+      }
+      return false
+    })
+
+  // Try to automatically approve tokens with 0 allowance
+  if (tokensNeedApproval.length > 0) {
+    await approveTokensForTrade(tokensNeedApproval)
+  }
+
+  // Set an intent for each side of the market we want to make
   // Your wallet must have 250 AST per intent to complete this step
   // Get testnet AST from the rinkeby faucet
   // https://ast-faucet-ui.development.airswap.io
 
-  console.log(TUSD, TGBP, TCAD, THKD, TAUD)
   await router
     .setIntents([
       {
         makerToken: TUSD,
         takerToken: TGBP,
         role: 'maker',
-        // supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
         swapVersion: 1,
       },
       {
         makerToken: TUSD,
         takerToken: TCAD,
         role: 'maker',
-        // supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
         swapVersion: 1,
       },
       {
         makerToken: TUSD,
         takerToken: THKD,
         role: 'maker',
-        // supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
         swapVersion: 1,
       },
       {
         makerToken: TUSD,
         takerToken: TAUD,
         role: 'maker',
-        // supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
         swapVersion: 1,
       },
       {
         makerToken: TGBP,
         takerToken: TUSD,
         role: 'maker',
-        // supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
         swapVersion: 1,
       },
       {
         makerToken: TCAD,
         takerToken: TUSD,
         role: 'maker',
-        // supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
         swapVersion: 1,
       },
       {
         makerToken: THKD,
         takerToken: TUSD,
         role: 'maker',
-        // supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
         swapVersion: 1,
       },
       {
         makerToken: TAUD,
         takerToken: TUSD,
         role: 'maker',
-        // supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
+        supportedMethods: ['getOrder', 'getQuote', 'getMaxQuote'],
         swapVersion: 1,
       },
     ])
