@@ -21,7 +21,7 @@ AirSwapInstant.render(
   {
     env: 'production',
     mode: 'buy',
-    token: '0x27054b13b1b798b345b591a4d22e6562d47ea75a',
+    token: '0x4e15361fd6b4bb609fa63c81a2be19d873717870',
     amount: '250',
     onClose: function() {
       console.info('Trade was canceled.')
@@ -41,7 +41,7 @@ AirSwapInstant.render(
     {
       env: 'production',
       mode: 'buy',
-      token: '0x27054b13b1b798b345b591a4d22e6562d47ea75a',
+      token: '0x4e15361fd6b4bb609fa63c81a2be19d873717870',
       amount: '250',
       onClose: function() {
         console.info('Trade was canceled.')
