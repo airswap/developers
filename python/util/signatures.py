@@ -34,8 +34,8 @@ def ecdsa(order, priv_key):
         address(order['takerAddress']) +
         uint(order['takerAmount']) +
         address(order['takerToken']) +
-        uint(order['nonce']) +
-        uint(order['expiration'])
+        uint(order['expiration']) +
+        uint(order['nonce'])
     )
 
     magic = keccak_256(b'\x19Ethereum Signed Message:\n32' + hashed_order.digest())
