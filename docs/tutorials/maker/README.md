@@ -1,7 +1,5 @@
 # Maker Tutorial
 
-!> Participating in the GitCoin virtual hackathon? This tutorial won't help with any of the bounties. Check out the [Gitbook](https://airswap.gitbook.io/airswap/) instead.
-
 ## Overview
 
 In [Concepts](../getting-started/concepts.md), we learned about Makers and Takers and how they interact with one another using dApps and APIs. We looked at the [Indexer](../api/indexer.md) and learned about Intents. In this tutorial, you'll learn how to put together these concepts in order to provide liquidity on the AirSwap network. Over the course of this tutorial, you'll learn how to:
@@ -156,7 +154,7 @@ function priceTrade(params) {
     makerAmount = params.makerAmount
     const makerAmountDecimals = TokenMetadata.formatDisplayValueByToken(
       { address: params.makerToken },
-      params.makerAmount,
+      params.makerAmount
     )
     const takerAmountDecimals = makerAmountDecimals * price
     takerAmount = TokenMetadata.formatAtomicValueByToken({ address: params.takerToken }, takerAmountDecimals)
@@ -165,7 +163,7 @@ function priceTrade(params) {
     takerAmount = params.takerAmount
     const takerAmountDecimals = TokenMetadata.formatDisplayValueByToken(
       { address: params.takerToken },
-      params.takerAmount,
+      params.takerAmount
     )
     const makerAmountDecimals = takerAmountDecimals / price
     makerAmount = TokenMetadata.formatAtomicValueByToken({ address: params.makerToken }, makerAmountDecimals)
