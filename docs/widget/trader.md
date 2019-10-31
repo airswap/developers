@@ -198,7 +198,9 @@ window.AirSwapTrader.render(
 | `order`    | [Order](#order) | `optional`     | The Order details. Provide values to pre-populate the order builder. If any of these parameters are specified, it will lock the value in the widget.                                                                                                                                          |
 | `cid`      | string          | `optional`     | [IPFS](https://ipfs.io) hash for the order. If provided, the widget will fetch the order details from IPFS and display a take order screen.                                                                                                                                                   |
 | `onCreate` | Function        | `optional`     | [Callback function](#onCreate) triggered on creation of a trade.                                                                                                                                                                                                                              |
+| `onSubmit` | Function        | `optional`     | [Callback function](#onSubmit) triggered on submission of a trade.                                                                                                                                                                                                                              |
 | `onSwap`   | Function        | `optional`     | [Callback function](#onSwap) triggered on a successful trade.                                                                                                                                                                                                                                 |
+| `onError`   | Function        | `optional`     | [Callback function](#onError) triggered when an error occurs on a trade submission.                                                                                                                                                                                                                                 |
 | `onCancel` | Function        | `optional`     | [Callback function](#onCancel) triggered on a successful cancel.                                                                                                                                                                                                                              |
 | `onClose`  | Function        | **`required`** | [Callback function](#onClose) triggered on widget close.                                                                                                                                                                                                                                      |
 
@@ -304,6 +306,19 @@ function onCreate(order, cid) {
 
 ---
 
+#### onSubmit
+
+Callback function triggered on submission of a trade. This does not necessarily mean that the trade was completed. No arguments.
+
+```js
+function onSubmit() {
+    console.log('Order Submitted!');
+    ...
+}
+```
+
+---
+
 #### onSwap
 
 Callback function triggered on a successful trade. Passes the transaction hash of the fill event as an argument.
@@ -311,6 +326,24 @@ Callback function triggered on a successful trade. Passes the transaction hash o
 ```js
 function onSwap(transactionHash) {
     console.log('Trade Completed!');
+    ...
+}
+```
+
+| Type              | Parameter | Description                                                                                                                            |
+| ----------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `transactionHash` | `string`  | Hash of the swap transaction. Can be used on blockchain explorers like [Etherscan](https://etherscan.io/) to view transaction details. |
+
+---
+
+#### onError
+
+Callback function triggered when an error occurs on a trade submission. The user can resolve the issue and try completing the trade again. Passes the error message as an argument.
+
+```js
+function onError(error) {
+    console.log('There was an error on trade submission');
+    console.log(error);
     ...
 }
 ```
