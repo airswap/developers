@@ -10,8 +10,8 @@ const { nest } = require('airswap.js/src/swap/utils')
 const PK = process.env.PRIVATE_KEY
 const ENV = process.env.ENV
 
-const makerSymbol = 'WETH'
-const takerSymbol = 'DAI'
+const signerSymbol = 'WETH'
+const senderSymbol = 'DAI'
 
 if (!ENV) {
   // noinspection JSAnnotator
@@ -39,46 +39,47 @@ console.log(`connecting to ${router.socketUrl}`)
 function priceTrade(params) {
   // Assume a fixed price of 0.01 DAI/WETH
   // You should implement your own pricing logic here.
-  const price = 200
+  const price = 160
 
-  let makerParam
-  let takerParam
+  let signerParam
+  let senderParam
 
-  if (params.makerParam) {
-    // Maker amount specified, calculate the amount taker must send
-    makerParam = params.makerParam
-    const makerParamDecimals = TokenMetadata.formatDisplayValueByToken({address: params.makerToken}, params.makerParam)
-    const takerParamDecimals = makerParamDecimals * price
-    takerParam = TokenMetadata.formatAtomicValueByToken({address: params.takerToken}, takerParamDecimals)
-  } else if (params.takerParam) {
-    // Taker amount specified, calculate the amount maker must send
-    takerParam = params.takerParam
-    const takerParamDecimals = TokenMetadata.formatDisplayValueByToken({address: params.takerToken}, params.takerParam)
-    const makerParamDecimals = takerParamDecimals / price
-    makerParam = TokenMetadata.formatAtomicValueByToken({address: params.makerToken}, makerParamDecimals)
+  if (params.signerParam) {
+    // Signer amount specified, calculate the amount sender must send
+    signerParam = params.signerParam
+    const signerParamDecimals = TokenMetadata.formatDisplayValueByToken({address: params.signerToken}, params.signerParam)
+    const senderParamDecimals = signerParamDecimals * price
+    senderParam = TokenMetadata.formatAtomicValueByToken({address: params.senderToken}, senderParamDecimals)
+  } else if (params.senderParam) {
+    // Sender amount specified, calculate the amount signer must send
+    senderParam = params.senderParam
+    const senderParamDecimals = TokenMetadata.formatDisplayValueByToken({address: params.senderToken}, params.senderParam)
+    const signerParamDecimals = senderParamDecimals / price
+    signerParam = TokenMetadata.formatAtomicValueByToken({address: params.signerToken}, signerParamDecimals)
   }
   return {
-    makerParam,
-    takerParam
+    signerParam,
+    senderParam
   }
 }
 
 async function getOrder(payload) {
   const { params } = payload.message
-
   // Price the order
-  const { makerParam, takerParam } = priceTrade(params)
+  const { signerParam, senderParam } = priceTrade(params)
+
   // Construct the order
   const order = {
     nonce: `${Date.now()}`,
-    makerWallet: address,
-    takerWallet: params.takerWallet,
-    makerParam: makerParam,
-    takerParam: takerParam,
-    makerToken: params.makerToken,
-    takerToken: params.takerToken,
+    signerWallet: address,
+    senderWallet: params.senderWallet,
+    signerParam: signerParam,
+    senderParam: senderParam,
+    signerToken: params.signerToken,
+    senderToken: params.senderToken,
     expiry: `${Math.round(new Date().getTime()/ 1000) + 300}` // Expire after 5 minutes
   }
+
   // Sign the order
   const signedOrder = await Swap.signSwap(nest(order), wallet)
 
@@ -91,22 +92,23 @@ async function getOrder(payload) {
 
   // Send the order
   router.call(payload.sender, response)
-  //console.log('sent order', response)
+  console.log('sent order', response)
 }
 
 async function getQuote(payload) {
   const { params } = payload.message
   // Price the quote
-  const { makerParam, takerParam } = priceTrade(params)
+  const { signerParam, senderParam } = priceTrade(params)
 
   // Construct the quote
-  const quote = nest({
-    makerParam: makerParam,
-    takerParam: takerParam,
-    makerToken: params.makerToken,
-    takerToken: params.takerToken,
-    makerWallet: address,
-  })
+  const quote = {
+    signerKind: '0x277f8169',
+    signerParam: signerParam,
+    signerToken: params.signerToken,
+    senderKind: '0x277f8169',
+    senderParam: senderParam,
+    senderToken: params.senderToken,
+  }
 
   // Construct a JSON RPC response
   response = {
@@ -117,7 +119,7 @@ async function getQuote(payload) {
 
   // Send the quote
   router.call(payload.sender, response)
-  // console.log('sent quote', response)
+  console.log('sent quote', response)
 }
 
 async function getMaxQuote(payload) {
@@ -126,19 +128,20 @@ async function getMaxQuote(payload) {
   const { params } = payload.message
 
   // Get our token balances to see how much liquidity we have available
-  const balances = await DeltaBalances.getManyBalancesManyAddresses([params.makerToken], [address])
-  const makerTokenBalance = balances[address][params.makerToken]
+  const balances = await DeltaBalances.getManyBalancesManyAddresses([params.signerToken], [address])
+  const signerTokenBalance = balances[address][params.signerToken]
 
-  params.makerParam = makerTokenBalance
+  params.signerParam = signerTokenBalance
   // Price the trade for the maximum amount
-  const { makerParam, takerParam } = priceTrade(params)
+  const { signerParam, senderParam } = priceTrade(params)
 
-  const quote = nest({
+  const quote = {
     ...params,
-    makerParam,
-    takerParam,
-    makerWallet: address
-  })
+    signerParam,
+    senderParam,
+    signerKind: '0x277f8169',
+    senderKind: '0x277f8169',
+  }
 
   // Construct a JSON RPC response
   response = {
@@ -160,8 +163,8 @@ async function main() {
 
   // Fetch token metadata
   await TokenMetadata.ready
-  const makerToken = TokenMetadata.tokenAddressesBySymbol[makerSymbol]
-  const takerToken = TokenMetadata.tokenAddressesBySymbol[takerSymbol]
+  const signerToken = TokenMetadata.tokenAddressesBySymbol[signerSymbol]
+  const senderToken = TokenMetadata.tokenAddressesBySymbol[senderSymbol]
 
   // Set an intent to trade DAI/WETH
   // Your wallet must have 250 DAI to complete this step.
@@ -170,24 +173,26 @@ async function main() {
 
   const intents = [
     {
-      makerToken,
-      takerToken,
+      makerToken: signerToken,
+      takerToken: senderToken,
       role: 'maker',
-      supportedMethods: ["getMakerSideOrder", "getTakerSideOrder", "getMakerSideQuote", "getTakerSideQuote", "getMaxQuote"],
+      supportedMethods: ["getSignerSideOrder", "getSenderSideOrder", "getSignerSideQuote", "getSenderSideQuote", "getMaxQuote"],
       swapVersion: 2
     }
   ]
+
+
   await router.setIntents(intents).then((resp) => {
-    console.log(`setIntents for ${makerSymbol}/${takerSymbol}`, resp, JSON.stringify(intents, null, 2), address)
+    console.log(`setIntents for ${signerSymbol}/${senderSymbol}`, resp, JSON.stringify(intents, null, 2), address)
   }).catch(e => {
-    console.log('unable to setIntents', e)
+    console.log(`unable to setIntents for signerWallet ${address}`, JSON.stringify(intents, null, 2), e)
   })
 
   // Set handlers for quotes
-  router.RPC_METHOD_ACTIONS['getMakerSideOrder'] = getOrder
-  router.RPC_METHOD_ACTIONS['getTakerSideOrder'] = getOrder
-  router.RPC_METHOD_ACTIONS['getMakerSideQuote'] = getQuote
-  router.RPC_METHOD_ACTIONS['getTakerSideQuote'] = getQuote
+  router.RPC_METHOD_ACTIONS['getSignerSideOrder'] = getOrder
+  router.RPC_METHOD_ACTIONS['getSenderSideOrder'] = getOrder
+  router.RPC_METHOD_ACTIONS['getSignerSideQuote'] = getQuote
+  router.RPC_METHOD_ACTIONS['getSenderSideQuote'] = getQuote
   router.RPC_METHOD_ACTIONS['getMaxQuote'] = getMaxQuote
 }
 
