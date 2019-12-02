@@ -1,3 +1,13 @@
-[![AirSwap Developer Documentation](./docs/assets/logo/AirSwap-Developers-Title.png)](https://developers.airswap.io)
+# AirSwap for Developers
 
-[View AirSwap Developer Documentation ⟶](https://developers.airswap.io)
+**:warning: This repository is deprecated.**
+
+Please visit AirSwap Docs and Maker Kit
+
+- [AirSwap Docs](https://docs.airswap.io)
+
+- [AirSwap Maker Kit](https://github.com/airswap/airswap-maker-kit)
+
+More About AirSwap
+
+[Website](https://www.airswap.io/) · [Blog](https://blog.airswap.io/) · [Support](https://support.airswap.io/) · [Community](https://chat.airswap.io/)
