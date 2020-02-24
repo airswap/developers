@@ -2,11 +2,11 @@
 
 **:warning: This repository is deprecated.**
 
-Please visit AirSwap Docs and Maker Kit
+Please visit AirSwap Docs and CLI
 
 - [AirSwap Docs](https://docs.airswap.io)
 
-- [AirSwap Maker Kit](https://github.com/airswap/airswap-maker-kit)
+- [AirSwap CLI](https://github.com/airswap/airswap-cli)
 
 More About AirSwap
 
