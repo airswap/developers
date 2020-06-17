@@ -4,7 +4,7 @@
 
 The API Server implements AirSwap.js to provide a REST HTTP API for interacting with the AirSwap network. You can use it locally to get/set intents, approve tokens for trading, submit orders, and more. You can also use it as a proxy for getOrder requests if you wish to implement a Maker in a different language than JavaScript.
 
-!> Running this example allows any peer on the AirSwap network to request / receive signed orders from you. The reference implementation should not be used on mainnet without proper order handling logic. By connecting to and using the AirSwap services you accept the [AirSwap Terms of Use](https://swap.tech/airswap-terms-of-use.pdf). Please also be sure to review the [LICENSE](LICENSE).
+!> Running this example allows any peer on the AirSwap network to request / receive signed orders from you. The reference implementation should not be used on mainnet without proper order handling logic. By connecting to and using the AirSwap services you accept the [AirSwap Terms of Use](https://airswap.io/airswap-terms-of-use.pdf). Please also be sure to review the [LICENSE](LICENSE).
 
 ## Requirements
 

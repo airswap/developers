@@ -10,7 +10,7 @@ The separation of concerns between the API Server and Order Server provides a si
 
 ## :warning: Warning
 
-Running this example allows any peer on the AirSwap network to request / receive signed orders from you. The reference implementation should not be used on mainnet without proper order handling logic. By connecting to and using the AirSwap services you accept the [AirSwap Terms of Use](https://swap.tech/airswap-terms-of-use.pdf). Please also be sure to review the [LICENSE](LICENSE).
+Running this example allows any peer on the AirSwap network to request / receive signed orders from you. The reference implementation should not be used on mainnet without proper order handling logic. By connecting to and using the AirSwap services you accept the [AirSwap Terms of Use](https://www.airswap.io/airswap-terms-of-use.pdf). Please also be sure to review the [LICENSE](LICENSE).
 
 # Client Server
 
